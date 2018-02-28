@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/lov_multi_select_transparent_black_percent_25" android:state_enabled="false" />
-    <item android:color="@color/lov_multi_select_primaryTextDark" />
+  <item android:color="@android:color/holo_blue_dark" android:state_checked="true" android:state_enabled="true"/>
+  <item android:color="@color/lov_multi_select_transparent_black_percent_25" android:state_enabled="false"/>
+  <item android:color="@color/lov_multi_select_primaryTextDark"/>
 </selector>

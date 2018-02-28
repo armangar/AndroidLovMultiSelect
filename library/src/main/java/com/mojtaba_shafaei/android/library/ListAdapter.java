@@ -42,4 +42,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
     this.data.addAll(data);
     notifyDataSetChanged();
   }
+
+  public List<Item> getSelectedItems() {
+    List<Item> items = new LinkedList<>();
+    for (Item i : data) {
+      if (i.isChecked()) {
+        items.add(i);
+      }
+    }
+    return items;
+  }
 }

@@ -3,8 +3,11 @@ package com.mojtaba_shafaei.android.library;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import com.mojtaba_shafaei.android.library.LovMultiSelect.Item;
 import java.util.ArrayList;
 import java.util.List;
+import org.parceler.Parcels;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    if (resultCode == RESULT_OK) {
+      List<Item> returnedData = Parcels.unwrap(data.getParcelableExtra("data"));
+      for (Item dd : returnedData) {
+        Log.d("MainActivity", "onActivityResult: " + dd);
+      }
+    }
 
   }
 }

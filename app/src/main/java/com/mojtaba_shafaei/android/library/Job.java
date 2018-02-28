@@ -43,4 +43,13 @@ public class Job implements LovMultiSelect.Item {
   public void toggle() {
     checked = !checked;
   }
+
+  @Override
+  public String toString() {
+    return "Job{" +
+        "checked=" + checked +
+        ", cod='" + cod + '\'' +
+        ", des='" + des + '\'' +
+        '}';
+  }
 }

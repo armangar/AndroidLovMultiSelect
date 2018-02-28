@@ -36,6 +36,7 @@ public class LovMultiSelect extends AppCompatActivity {
     String getCod();
 
     String getDes();
+
   }
 
   public static void startForResult(Fragment fragment,
@@ -82,7 +83,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
     btnOk.setOnClickListener((view) -> {
       Intent result = new Intent();
-      result.putExtra("data", "todo");
+      result.putExtra("data", Parcels.wrap(listAdapter.getSelectedItems()));
       setResult(RESULT_OK, result);
       getActivity().finish();
     });
