@@ -8,6 +8,7 @@ import org.parceler.Parcel;
 @Parcel
 public class Job implements LovMultiSelect.Item {
 
+  private boolean checked;
   private String cod, des;
 
   public Job() {
@@ -26,5 +27,20 @@ public class Job implements LovMultiSelect.Item {
   @Override
   public String getDes() {
     return des;
+  }
+
+  @Override
+  public void setChecked(boolean b) {
+    checked = b;
+  }
+
+  @Override
+  public boolean isChecked() {
+    return checked;
+  }
+
+  @Override
+  public void toggle() {
+    checked = !checked;
   }
 }
