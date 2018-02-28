@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_pressed="true">
+    <shape android:shape="oval">
+      <solid android:color="@color/lov_multi_select_flat_button_pressed_light_theme"/>
+    </shape>
+  </item>
+
+  <item android:state_enabled="false">
+    <shape android:shape="oval">
+      <solid android:color="@color/lov_multi_select_flat_button_disabled_light_theme"/>
+    </shape>
+  </item>
+
+  <item>
+    <shape android:shape="oval">
+      <solid android:color="@android:color/transparent"/>
+    </shape>
+  </item>
+</selector>

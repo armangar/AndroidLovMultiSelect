@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="lov_multi_select_flat_button_pressed_light_theme">#66999999</color>
+  <color name="lov_multi_select_flat_button_disabled_light_theme">#43000000</color>
+  <color name="lov_multi_select_transparent_white_percent_12">#31ffffff</color>
+  <color name="lov_multi_select_transparent_black_percent_20">#33000000</color>
+  <color name="lov_multi_select_grey200">#EEEEEE</color>
+  <color name="lov_multi_select_disabledAndHintTextLight">#808080</color>
+  <color name="lov_multi_select_transparent_black_percent_25">#40000000</color>
+  <color name="lov_multi_select_primaryTextDark">@color/lov_multi_select_grey_percent_13</color>
+  <color name="lov_multi_select_grey_percent_13">#212121</color>
+</resources>

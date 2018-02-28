@@ -1,2 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mojtaba_shafaei.android.androidLovMultiSelect" />
+  package="com.mojtaba_shafaei.android.library">
+
+  <application>
+    <activity android:name="com.mojtaba_shafaei.android.library.LovMultiSelect"
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+  </application>
+</manifest>
