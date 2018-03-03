@@ -132,7 +132,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
       @Override
       public void onTagCrossClick(int position) {
-       //todo removeTag(position, text);
+        removeTag(position, tagView.getTagText(position));
       }
     });
 
