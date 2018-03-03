@@ -2,4 +2,5 @@
 <resources>
   <string name="lov_multi_select_app_name">library</string>
   <string name="lov_multi_select_search">جستجو</string>
+  <string name="lov_multi_select_i_got_it">متوجه شدم</string>
 </resources>
