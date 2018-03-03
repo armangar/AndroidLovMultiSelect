@@ -71,14 +71,31 @@
 
   </android.support.constraint.ConstraintLayout>
 
-  <GridLayout
-    android:id="@+id/selected_items_list"
+  <co.lujun.androidtagview.TagContainerLayout
+    android:id="@+id/tag_group"
     android:layout_width="0dp"
     android:layout_height="120dp"
-    android:background="#FFF"
+    android:layout_marginTop="4dp"
+    android:padding="8dp"
+    app:container_background_color="#ccc"
+    app:container_border_color="#DDD"
+    app:container_border_width="1dp"
+    app:container_border_radius="0dp"
+    app:container_enable_drag="false"
+    app:container_gravity="right"
+    app:horizontal_interval="8dp"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+    app:layout_constraintTop_toBottomOf="@id/toolbar"
+    app:tag_border_color="#43000000"
+    app:tag_clickable="true"
+    app:tag_corner_radius="4dp"
+    app:tag_cross_color="@color/lov_multi_select_red_a400"
+    app:tag_cross_line_width="2dp"
+    app:tag_cross_width="24dp"
+    app:tag_enable_cross="true"
+    app:tag_theme="pure_teal"
+    app:vertical_interval="8dp"/>
 
   <android.support.v7.widget.RecyclerView
     android:id="@+id/list"
@@ -88,7 +105,7 @@
     app:layout_constraintBottom_toTopOf="@id/lov_multi_select_btn_ok"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/selected_items_list"/>
+    app:layout_constraintTop_toBottomOf="@id/tag_group"/>
 
   <android.support.v7.widget.AppCompatButton
     android:id="@+id/lov_multi_select_btn_ok"

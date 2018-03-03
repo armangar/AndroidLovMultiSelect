@@ -22,8 +22,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Checkable;
-import android.widget.GridLayout;
 import android.widget.ProgressBar;
+import co.lujun.androidtagview.TagContainerLayout;
+import co.lujun.androidtagview.TagView.OnTagClickListener;
 import com.mojtaba_shafaei.android.androidBottomDialog.BottomDialog;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -48,7 +49,7 @@ public class LovMultiSelect extends AppCompatActivity {
   private AppCompatImageButton btnClearSearch;
   private AppCompatButton btnOk;
   private RecyclerView list;
-  private GridLayout listSelected;
+  private TagContainerLayout tagView;
 
 
   private ListAdapter listAdapter;
@@ -101,6 +102,7 @@ public class LovMultiSelect extends AppCompatActivity {
     btnBack = findViewById(R.id.lov_multi_select_btn_back);
     btnOk = findViewById(R.id.lov_multi_select_btn_ok);
     list = findViewById(R.id.list);
+    tagView = findViewById(R.id.tag_group);
     //</editor-fold>
 
     btnBack.setOnClickListener((view) -> {
@@ -117,7 +119,31 @@ public class LovMultiSelect extends AppCompatActivity {
       getActivity().finish();
     });
 
-    listAdapter = new ListAdapter(this);
+    tagView.setOnTagClickListener(new OnTagClickListener() {
+      @Override
+      public void onTagClick(int position, String text) {
+        removeTag(position, text);
+      }
+
+      @Override
+      public void onTagLongClick(int position, String text) {
+        removeTag(position, text);
+      }
+
+      @Override
+      public void onTagCrossClick(int position) {
+       //todo removeTag(position, text);
+      }
+    });
+
+    listAdapter = new ListAdapter(this, (position, item) -> {
+      if (item.isChecked()) {
+        tagView.addTag(item.getDes());
+      } else {
+        removeTag(position, item.getDes());
+      }
+    });
+
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
     listAdapter.setData(dataSet);
@@ -193,6 +219,11 @@ public class LovMultiSelect extends AppCompatActivity {
               }
             })
     );
+  }
+
+  private void removeTag(int position, String des) {
+    tagView.removeTag(position);
+    listAdapter.removeTag(des);
   }
 
   private void showError(Throwable e) {

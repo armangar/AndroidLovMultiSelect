@@ -12,9 +12,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
   private final List<Item> data = new LinkedList<>();
   private final LayoutInflater inflater;
+  private final OnListItemClickListener onListItemClickListener;
 
-  public ListAdapter(Context context) {
+  public ListAdapter(Context context, OnListItemClickListener onListItemClickListener) {
     inflater = LayoutInflater.from(context);
+    this.onListItemClickListener = onListItemClickListener;
   }
 
   @Override
@@ -24,11 +26,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
   @Override
   public void onBindViewHolder(ListHolder holder, int _position) {
-    int position = holder.getAdapterPosition();
+    final int position = holder.getAdapterPosition();
     Item item = data.get(position);
     holder.initWith(data.get(position), (view, checked) -> {
       item.setChecked(checked);
       data.set(position, item);
+
+      onListItemClickListener.onListItemClicked(position, item);
     });
   }
 
@@ -51,5 +55,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
       }
     }
     return items;
+  }
+
+  public void removeTag(String des) {
+    int position = -1;
+    int len = data.size();
+    for (int i = 0; i < len; i++) {
+      if (data.get(i).getDes().equals(des)) {
+        position = i;
+        break;
+      }
+    }
+    Item item = data.get(position);
+    item.setChecked(false);
+
+    data.get(position).setChecked(false);
+    data.set(position, item);
+    notifyDataSetChanged();
   }
 }

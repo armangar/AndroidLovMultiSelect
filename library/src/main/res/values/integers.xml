@@ -2,4 +2,5 @@
 <resources>
   <integer name="lov_multi_select_config_debounce_duration">300</integer>
   <integer name="lov_multi_select_config_throttle_duration">600</integer>
+  <integer name="lov_multi_select_num_columns">2</integer>
 </resources>
