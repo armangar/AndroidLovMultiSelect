@@ -2,7 +2,9 @@
   package="com.mojtaba_shafaei.android.library">
 
   <application>
-    <activity android:name="com.mojtaba_shafaei.android.library.LovMultiSelect"
-      android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+    <activity
+      android:name="com.mojtaba_shafaei.android.library.LovMultiSelect"
+      android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+      android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
   </application>
 </manifest>

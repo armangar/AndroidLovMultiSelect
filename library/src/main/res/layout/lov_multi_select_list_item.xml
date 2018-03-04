@@ -9,6 +9,7 @@
   android:paddingBottom="20dp"
   android:paddingLeft="8dp"
   android:paddingRight="8dp"
+  android:background="#00FFFFFF"
   android:checkMark="?android:attr/textCheckMark"
   android:checked="false"
   android:foreground="?android:attr/selectableItemBackground"

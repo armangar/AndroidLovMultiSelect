@@ -20,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.ProgressBar;
@@ -43,6 +44,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private final String TAG = "LovMultiSelect";
 
+  private View toolbar;
   private ProgressBar progressBar;
   private AppCompatEditText searchView;
   private AppCompatImageButton btnBack;
@@ -96,6 +98,7 @@ public class LovMultiSelect extends AppCompatActivity {
     dataSet = Parcels.unwrap(getIntent().getParcelableExtra("data"));
 
     //<editor-fold desc="Ui Binding">
+    toolbar = findViewById(R.id.toolbar);
     progressBar = findViewById(R.id.progressBar);
     searchView = findViewById(R.id.search_view);
     btnClearSearch = findViewById(R.id.lov_multi_select_btn_clear_search);
@@ -105,6 +108,7 @@ public class LovMultiSelect extends AppCompatActivity {
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
 
+    ViewCompat.setElevation(toolbar, dpToPx(4));
     btnBack.setOnClickListener((view) -> {
       setResult(RESULT_CANCELED);
       getActivity().finish();
@@ -127,7 +131,6 @@ public class LovMultiSelect extends AppCompatActivity {
 
       @Override
       public void onTagLongClick(int position, String text) {
-        removeTag(text);
       }
 
       @Override
@@ -138,7 +141,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
     listAdapter = new ListAdapter(this, (position, item) -> {
       if (item.isChecked()) {
-        tagView.addTag(item.getDes());
+        tagView.addTag(item.getDes(), 0);
       } else {
         removeTag(item.getDes());
       }
@@ -307,4 +310,15 @@ public class LovMultiSelect extends AppCompatActivity {
       searchView.removeTextChangedListener(textWatcher);
     }
   }
+
+  int dpToPx(int dp) {
+        /*DisplayMetrics displayMetrics = MyApplication.getInstance().getResources().getDisplayMetrics();
+        int px = Math.round((dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)) + .5f);*/
+
+    int px = (int) TypedValue
+        .applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+
+    return px;
+  }
+
 }

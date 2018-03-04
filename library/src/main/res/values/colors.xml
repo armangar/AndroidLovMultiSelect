@@ -9,5 +9,6 @@
   <color name="lov_multi_select_transparent_black_percent_25">#40000000</color>
   <color name="lov_multi_select_primaryTextDark">@color/lov_multi_select_grey_percent_13</color>
   <color name="lov_multi_select_grey_percent_13">#212121</color>
-  <color name="lov_multi_select_red_a400">#FF1744</color>
+  <color name="lov_multi_select_cross_color">#FFF</color>
+  <color name="lov_multi_select_color_tag_background">#673695</color>
 </resources>
