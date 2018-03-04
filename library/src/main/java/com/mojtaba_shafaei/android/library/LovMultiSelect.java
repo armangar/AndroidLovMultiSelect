@@ -122,17 +122,17 @@ public class LovMultiSelect extends AppCompatActivity {
     tagView.setOnTagClickListener(new OnTagClickListener() {
       @Override
       public void onTagClick(int position, String text) {
-        removeTag(position, text);
+
       }
 
       @Override
       public void onTagLongClick(int position, String text) {
-        removeTag(position, text);
+        removeTag(text);
       }
 
       @Override
       public void onTagCrossClick(int position) {
-        removeTag(position, tagView.getTagText(position));
+        removeTag(tagView.getTagText(position));
       }
     });
 
@@ -140,7 +140,7 @@ public class LovMultiSelect extends AppCompatActivity {
       if (item.isChecked()) {
         tagView.addTag(item.getDes());
       } else {
-        removeTag(position, item.getDes());
+        removeTag(item.getDes());
       }
     });
 
@@ -221,8 +221,17 @@ public class LovMultiSelect extends AppCompatActivity {
     );
   }
 
-  private void removeTag(int position, String des) {
-    tagView.removeTag(position);
+  private void removeTag(String des) {
+    List<String> tags = tagView.getTags();
+    final int len = tags.size();
+    for (int i = 0; i < len; i++) {
+      if (tags.get(i).equals(des)) {
+        tags.remove(i);
+        break;
+      }
+    }
+
+    tagView.setTags(tags);
     listAdapter.removeTag(des);
   }
 
@@ -264,20 +273,14 @@ public class LovMultiSelect extends AppCompatActivity {
       case READY: {
         hideLoading();
         hideErrors();
-        setFormEnabled(true);
       }
       break;
 
       case LOADING: {
         showLoading();
-        setFormEnabled(false);
       }
       break;
     }
-  }
-
-  private void setFormEnabled(boolean enabled) {
-    searchView.setEnabled(enabled);
   }
 
   private void showLoading() {
