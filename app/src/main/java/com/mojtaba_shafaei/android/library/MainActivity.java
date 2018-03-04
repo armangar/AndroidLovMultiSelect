@@ -1,6 +1,7 @@
 package com.mojtaba_shafaei.android.library;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,11 +34,13 @@ public class MainActivity extends AppCompatActivity {
     jobs.add(new Job("14", "FOURTEEN"));
     jobs.add(new Job("15", "FIFTEEN"));
 
+    Typeface typeface = Typeface.createFromAsset(getAssets(), "IRANSansMobile.ttf");
     findViewById(R.id.btn_call_lov).setOnClickListener(
         view -> LovMultiSelect.startForResult(MainActivity.this,
             11,
             jobs,
-            null));
+            null,
+            typeface));
   }
 
 

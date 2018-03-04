@@ -37,7 +37,7 @@
       android:layout_marginRight="16dp"
       android:gravity="right|center_vertical"
       android:hint="@string/lov_multi_select_search"
-      android:textColor="#fff"
+      android:textColor="@color/lov_multi_select_colors_text_dark"
       android:textColorHint="@color/lov_multi_select_disabledAndHintTextLight"
       app:layout_constraintLeft_toRightOf="@id/lov_multi_select_btn_clear_search"
       app:layout_constraintRight_toLeftOf="@id/lov_multi_select_btn_back"

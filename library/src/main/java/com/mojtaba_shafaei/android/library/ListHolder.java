@@ -24,5 +24,9 @@ class ListHolder extends ViewHolder {
       des.toggle();
       onCheckedChangeListener.onCheckedChanged(view, des.isChecked());
     });
+
+    if (LovMultiSelect.defaultTypeface != null) {
+      des.setTypeface(LovMultiSelect.defaultTypeface);
+    }
   }
 }

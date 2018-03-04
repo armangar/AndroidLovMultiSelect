@@ -13,13 +13,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   private final List<Item> data = new LinkedList<>();
   private final LayoutInflater inflater;
   private final OnListItemClickListener onListItemClickListener;
-  private final OnSelectedDataChangedListener onSelectedDataChangedListener;
 
-  public ListAdapter(Context context, OnListItemClickListener onListItemClickListener
-      , OnSelectedDataChangedListener onSelectedDataChangedListener) {
+  public ListAdapter(Context context, OnListItemClickListener onListItemClickListener) {
     inflater = LayoutInflater.from(context);
     this.onListItemClickListener = onListItemClickListener;
-    this.onSelectedDataChangedListener = onSelectedDataChangedListener;
   }
 
   @Override
@@ -36,7 +33,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
       data.set(position, item);
 
       onListItemClickListener.onListItemClicked(position, item);
-      onSelectedDataChangedListener.onDataChanged(getSelectedItems().size());
     });
   }
 
@@ -80,6 +76,5 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
   void notifyDataSetChanged1() {
     notifyDataSetChanged();
-    onSelectedDataChangedListener.onDataChanged(getSelectedItems().size());
   }
 }

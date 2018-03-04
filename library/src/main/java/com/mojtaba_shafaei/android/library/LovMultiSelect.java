@@ -7,6 +7,7 @@ import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -65,6 +66,8 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private final Locale FA_LOCALE = new Locale("fa");
 
+  public static Typeface defaultTypeface = null;
+
   public interface Item extends Checkable {
 
     String getCod();
@@ -84,10 +87,12 @@ public class LovMultiSelect extends AppCompatActivity {
   public static void startForResult(Activity activity,
       int requestCod,
       @NonNull Collection<? extends Item> dataSet,
-      @Nullable View viewTransition) {
+      @Nullable View viewTransition,
+      Typeface typeface) {
 
     Intent starter = new Intent(activity, LovMultiSelect.class);
     starter.putExtra("data", Parcels.wrap(dataSet));
+    defaultTypeface = typeface;
     activity.startActivityForResult(starter, requestCod);
   }
 
@@ -110,6 +115,12 @@ public class LovMultiSelect extends AppCompatActivity {
     list = findViewById(R.id.list);
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
+
+    if (defaultTypeface != null) {
+      searchView.setTypeface(defaultTypeface);
+      btnOk.setTypeface(defaultTypeface);
+      tagView.setTagTypeface(defaultTypeface);
+    }
 
     ViewCompat.setElevation(toolbar, dpToPx(4));
     btnBack.setOnClickListener((view) -> {
@@ -145,11 +156,11 @@ public class LovMultiSelect extends AppCompatActivity {
     listAdapter = new ListAdapter(this, (position, item) -> {
       if (item.isChecked()) {
         tagView.addTag(item.getDes(), 0);
+        refreshSelectedCounter(tagView.getTags().size());
       } else {
         removeTag(item.getDes());
       }
-    },
-        this::refreshSelectedCounter);
+    });
 
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
@@ -226,6 +237,8 @@ public class LovMultiSelect extends AppCompatActivity {
               }
             })
     );
+
+    refreshSelectedCounter(0);
   }
 
   private void removeTag(String des) {
@@ -240,6 +253,8 @@ public class LovMultiSelect extends AppCompatActivity {
 
     tagView.setTags(tags);
     listAdapter.unCheckTag(des);
+
+    refreshSelectedCounter(tagView.getTags().size());
   }
 
   private void refreshSelectedCounter(int count) {
@@ -266,7 +281,7 @@ public class LovMultiSelect extends AppCompatActivity {
           .withCancelable(false)
           .withHiddenNegativeButton(true)
           .withPositiveText(getString(R.string.lov_multi_select_i_got_it))
-//TODO          .withDefaultTypeface(PersianFont.IRANSANS_NORMAL(getActivity()))
+          .withDefaultTypeface(defaultTypeface)
           .withContent(e.getMessage())
           .build()
           .show(LovMultiSelect.this);
@@ -329,6 +344,7 @@ public class LovMultiSelect extends AppCompatActivity {
     if (textWatcher != null) {
       searchView.removeTextChangedListener(textWatcher);
     }
+    defaultTypeface = null;
   }
 
   int dpToPx(int dp) {
