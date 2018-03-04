@@ -3,4 +3,6 @@
   <string name="lov_multi_select_app_name">library</string>
   <string name="lov_multi_select_search">جستجو</string>
   <string name="lov_multi_select_i_got_it">متوجه شدم</string>
+  <string name="lov_multi_select_btn_ok_text">انتخاب کن  ( %d مورد )</string>
+  <string name="lov_multi_select_choose_at_least_one">حداقل یک مورد انتخاب کنید…</string>
 </resources>

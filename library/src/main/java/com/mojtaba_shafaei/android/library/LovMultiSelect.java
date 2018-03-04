@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import org.parceler.Parcels;
 
@@ -61,6 +62,8 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private final BehaviorSubject<String> subject = BehaviorSubject.create();
   private final CompositeDisposable disposable = new CompositeDisposable();
+
+  private final Locale FA_LOCALE = new Locale("fa");
 
   public interface Item extends Checkable {
 
@@ -145,7 +148,8 @@ public class LovMultiSelect extends AppCompatActivity {
       } else {
         removeTag(item.getDes());
       }
-    });
+    },
+        this::refreshSelectedCounter);
 
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(listAdapter);
@@ -235,7 +239,23 @@ public class LovMultiSelect extends AppCompatActivity {
     }
 
     tagView.setTags(tags);
-    listAdapter.removeTag(des);
+    listAdapter.unCheckTag(des);
+  }
+
+  private void refreshSelectedCounter(int count) {
+    if (count != 0) {
+      btnOk.setText(String
+          .format(FA_LOCALE,
+              getString(R.string.lov_multi_select_btn_ok_text),
+              count)
+      );
+      btnOk.setEnabled(true);
+    } else {
+      btnOk.setText(R.string.lov_multi_select_choose_at_least_one);
+      btnOk.setEnabled(false);
+    }
+
+
   }
 
   private void showError(Throwable e) {

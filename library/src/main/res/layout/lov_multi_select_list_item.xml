@@ -10,7 +10,7 @@
   android:paddingLeft="8dp"
   android:paddingRight="8dp"
   android:background="#00FFFFFF"
-  android:checkMark="?android:attr/textCheckMark"
+  android:checkMark="@drawable/lov_multi_select_check_mark"
   android:checked="false"
   android:foreground="?android:attr/selectableItemBackground"
   android:gravity="center_vertical|right"
