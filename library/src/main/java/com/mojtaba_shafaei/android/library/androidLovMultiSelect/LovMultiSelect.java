@@ -1,7 +1,4 @@
-package com.mojtaba_shafaei.android.library;
-
-import static com.mojtaba_shafaei.android.library.ViewStatus.LOADING;
-import static com.mojtaba_shafaei.android.library.ViewStatus.READY;
+package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
@@ -132,6 +129,9 @@ public class LovMultiSelect extends AppCompatActivity {
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
     btnClearSearch.setVisibility(View.INVISIBLE);
+    findViewById(R.id.spacer).setVisibility(
+        getResources().getBoolean(R.bool.lov_multi_select_shadow_visible) ? View.VISIBLE
+            : View.GONE);
 
     if (defaultTypeface != null) {
       searchView.setTypeface(defaultTypeface);
@@ -245,7 +245,7 @@ public class LovMultiSelect extends AppCompatActivity {
             .observeOn(AndroidSchedulers.mainThread())
             .map(_data -> {
               if (!disposable.isDisposed()) {
-                setFormStatus(LOADING);
+                setFormStatus(ViewStatus.LOADING);
               }
               return _data;
             })
@@ -266,7 +266,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 if (isDisposed()) {
                   return;
                 }
-                setFormStatus(READY);
+                setFormStatus(ViewStatus.READY);
                 refreshAdapter(items);
               }
 
@@ -275,7 +275,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 if (isDisposed()) {
                   return;
                 }
-                setFormStatus(READY);
+                setFormStatus(ViewStatus.READY);
                 showError(e);
               }
 
@@ -358,13 +358,13 @@ public class LovMultiSelect extends AppCompatActivity {
 
   public void setFormStatus(int status) {
     switch (status) {
-      case READY: {
+      case ViewStatus.READY: {
         hideLoading();
         hideErrors();
       }
       break;
 
-      case LOADING: {
+      case ViewStatus.LOADING: {
         showLoading();
       }
       break;

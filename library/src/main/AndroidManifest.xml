@@ -1,9 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.mojtaba_shafaei.android.library">
-
+  package="com.mojtaba_shafaei.android.library.androidLovMultiSelect">
   <application>
     <activity
-      android:name="com.mojtaba_shafaei.android.library.LovMultiSelect"
+      android:name=".LovMultiSelect"
       android:theme="@style/Theme.AppCompat.Light.NoActionBar"
       android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
   </application>

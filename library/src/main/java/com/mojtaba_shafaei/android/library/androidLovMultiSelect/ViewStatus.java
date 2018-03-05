@@ -1,4 +1,4 @@
-package com.mojtaba_shafaei.android.library;
+package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;

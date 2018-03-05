@@ -1,5 +1,6 @@
 package com.mojtaba_shafaei.android.library;
 
+import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect;
 import org.parceler.Parcel;
 
 /**

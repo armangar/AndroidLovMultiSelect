@@ -108,10 +108,20 @@
         app:tag_ripple_duration="0"
         app:tag_text_color="#FFF"
         app:tag_theme="none"
-        app:vertical_interval="3dp"/>
+        app:vertical_interval="4dp"/>
     </android.support.v4.widget.NestedScrollView>
 
   </android.support.constraint.ConstraintLayout>
+
+  <View
+    android:id="@+id/spacer"
+    android:layout_width="0dp"
+    android:layout_height="3dp"
+    android:background="@drawable/lov_multi_select_shadow"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+
   <android.support.v7.widget.RecyclerView
     android:id="@+id/list"
     android:layout_width="0dp"
@@ -120,7 +130,7 @@
     app:layout_constraintBottom_toTopOf="@id/lov_multi_select_btn_ok"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+    app:layout_constraintTop_toBottomOf="@id/spacer"/>
 
   <android.support.v7.widget.AppCompatButton
     android:id="@+id/lov_multi_select_btn_ok"

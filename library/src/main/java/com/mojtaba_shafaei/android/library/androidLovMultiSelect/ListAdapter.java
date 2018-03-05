@@ -1,10 +1,10 @@
-package com.mojtaba_shafaei.android.library;
+package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import com.mojtaba_shafaei.android.library.LovMultiSelect.Item;
+import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect.Item;
 import java.util.LinkedList;
 import java.util.List;
 

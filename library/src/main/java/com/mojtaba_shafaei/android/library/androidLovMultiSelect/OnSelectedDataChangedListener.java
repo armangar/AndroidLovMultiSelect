@@ -1,4 +1,4 @@
-package com.mojtaba_shafaei.android.library;
+package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 /**
  * Created by mojtaba on 3/4/18.
