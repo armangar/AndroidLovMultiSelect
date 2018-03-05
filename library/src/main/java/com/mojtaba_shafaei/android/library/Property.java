@@ -19,6 +19,7 @@ public final class Property {
   @ColorRes
   private Integer tagBorderColor = null;
 
+  private String btnOkText = "";
 
   public Property() {
   }
@@ -27,6 +28,7 @@ public final class Property {
     buttonOkBackgroundDrawable = builder.buttonOkBackgroundDrawable;
     tagBackgroundColor = builder.tagBackgroundColor;
     tagBorderColor = builder.tagBorderColor;
+    btnOkText = builder.btnOkText;
   }
 
   public static Builder newBuilder() {
@@ -47,11 +49,16 @@ public final class Property {
     return tagBorderColor;
   }
 
+  public String getBtnOkText() {
+    return btnOkText;
+  }
+
   public static final class Builder {
 
     private Integer buttonOkBackgroundDrawable;
     private Integer tagBackgroundColor;
     private Integer tagBorderColor;
+    private String btnOkText;
 
     private Builder() {
     }
@@ -65,8 +72,14 @@ public final class Property {
       this.tagBackgroundColor = tagBackgroundColor;
       return this;
     }
+
     public Builder withTagBorderColor(Integer tagBorderColor) {
       this.tagBorderColor = tagBorderColor;
+      return this;
+    }
+
+    public Builder withBtnOkText(String text) {
+      this.btnOkText = text;
       return this;
     }
 

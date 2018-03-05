@@ -5,7 +5,8 @@
   android:id="@+id/root"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:background="@color/lov_multi_select_grey200">
+  android:background="@color/lov_multi_select_grey200"
+  android:transitionName="LOV_TRANSITION">
 
   <android.support.constraint.ConstraintLayout
     android:id="@+id/toolbar"

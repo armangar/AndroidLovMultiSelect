@@ -8,9 +8,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -68,6 +71,9 @@ public class LovMultiSelect extends AppCompatActivity {
   private final Locale FA_LOCALE = new Locale("fa");
 
   public static Typeface defaultTypeface = null;
+  private Property properties;
+
+  public static final String LOV_MULTI_SELECT_TRANSITION_NAME = "LOV_TRANSITION";
 
   public interface Item extends Checkable {
 
@@ -96,7 +102,14 @@ public class LovMultiSelect extends AppCompatActivity {
     starter.putExtra("data", Parcels.wrap(dataSet));
     starter.putExtra("properties", Parcels.wrap(params));
     defaultTypeface = typeface;
-    activity.startActivityForResult(starter, requestCod);
+
+    if (VERSION.SDK_INT >= 21 && viewTransition != null) {
+      ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+          activity, viewTransition, LOV_MULTI_SELECT_TRANSITION_NAME);
+      activity.startActivityForResult(starter, requestCod, activityOptions.toBundle());
+    } else {
+      activity.startActivityForResult(starter, requestCod);
+    }
   }
 
   @Override
@@ -118,6 +131,7 @@ public class LovMultiSelect extends AppCompatActivity {
     list = findViewById(R.id.list);
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
+    btnClearSearch.setVisibility(View.INVISIBLE);
 
     if (defaultTypeface != null) {
       searchView.setTypeface(defaultTypeface);
@@ -125,7 +139,7 @@ public class LovMultiSelect extends AppCompatActivity {
       tagView.setTagTypeface(defaultTypeface);
     }
 
-    Property properties = Parcels.unwrap(getIntent().getParcelableExtra("properties"));
+    properties = Parcels.unwrap(getIntent().getParcelableExtra("properties"));
     if (properties != null) {
       if (properties.getButtonOkBackgroundDrawable() != null) {
         btnOk.setBackgroundDrawable(ContextCompat.getDrawable(this,
@@ -146,7 +160,11 @@ public class LovMultiSelect extends AppCompatActivity {
     ViewCompat.setElevation(toolbar, dpToPx(4));
     btnBack.setOnClickListener((view) -> {
       setResult(RESULT_CANCELED);
-      getActivity().finish();
+      if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+        getActivity().finishAfterTransition();
+      } else {
+        finish();
+      }
     });
 
     btnClearSearch.setOnClickListener((view) -> searchView.setText(""));
@@ -155,7 +173,11 @@ public class LovMultiSelect extends AppCompatActivity {
       Intent result = new Intent();
       result.putExtra("data", Parcels.wrap(listAdapter.getSelectedItems()));
       setResult(RESULT_OK, result);
-      getActivity().finish();
+      if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+        getActivity().finishAfterTransition();
+      } else {
+        finish();
+      }
     });
 
     tagView.setOnTagClickListener(new OnTagClickListener() {
@@ -195,6 +217,11 @@ public class LovMultiSelect extends AppCompatActivity {
 
       @Override
       public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        if (charSequence.length() == 0) {
+          btnClearSearch.setVisibility(View.INVISIBLE);
+        } else {
+          btnClearSearch.setVisibility(View.VISIBLE);
+        }
         subject.onNext(charSequence.toString());
       }
 
@@ -283,6 +310,8 @@ public class LovMultiSelect extends AppCompatActivity {
       btnOk.setText(String
           .format(FA_LOCALE,
               getString(R.string.lov_multi_select_btn_ok_text),
+              (properties != null && properties.getBtnOkText() != null) ? properties.getBtnOkText()
+                  : "انتخاب کن",
               count)
       );
       btnOk.setEnabled(true);

@@ -40,12 +40,13 @@ public class MainActivity extends AppCompatActivity {
         view -> LovMultiSelect.startForResult(MainActivity.this,
             11,
             jobs,
-            null,
+            findViewById(R.id.btn_call_lov),
             typeface,
             Property.newBuilder()
                 .withButtonOkBackgroundDrawable(R.drawable.btn_ok_bg)
                 .withTagBackgroundColor(R.color.colorPrimary)
                 .withTagBorderColor(R.color.colorAccent)
+                .withBtnOkText("باشه")
                 .build()));
   }
 
