@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -88,10 +89,12 @@ public class LovMultiSelect extends AppCompatActivity {
       int requestCod,
       @NonNull Collection<? extends Item> dataSet,
       @Nullable View viewTransition,
-      Typeface typeface) {
+      Typeface typeface,
+      Property params) {
 
     Intent starter = new Intent(activity, LovMultiSelect.class);
     starter.putExtra("data", Parcels.wrap(dataSet));
+    starter.putExtra("properties", Parcels.wrap(params));
     defaultTypeface = typeface;
     activity.startActivityForResult(starter, requestCod);
   }
@@ -120,6 +123,24 @@ public class LovMultiSelect extends AppCompatActivity {
       searchView.setTypeface(defaultTypeface);
       btnOk.setTypeface(defaultTypeface);
       tagView.setTagTypeface(defaultTypeface);
+    }
+
+    Property properties = Parcels.unwrap(getIntent().getParcelableExtra("properties"));
+    if (properties != null) {
+      if (properties.getButtonOkBackgroundDrawable() != null) {
+        btnOk.setBackgroundDrawable(ContextCompat.getDrawable(this,
+            properties.getButtonOkBackgroundDrawable()));
+      }
+
+      if (properties.getTagBackgroundColor() != null) {
+        tagView.setTagBackgroundColor(ContextCompat.getColor(this,
+            properties.getTagBackgroundColor()));
+      }
+
+      if (properties.getTagBorderColor() != null) {
+        tagView.setTagBorderColor(ContextCompat.getColor(this,
+            properties.getTagBorderColor()));
+      }
     }
 
     ViewCompat.setElevation(toolbar, dpToPx(4));

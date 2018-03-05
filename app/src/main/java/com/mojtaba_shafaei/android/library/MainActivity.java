@@ -35,12 +35,18 @@ public class MainActivity extends AppCompatActivity {
     jobs.add(new Job("15", "FIFTEEN"));
 
     Typeface typeface = Typeface.createFromAsset(getAssets(), "IRANSansMobile.ttf");
+
     findViewById(R.id.btn_call_lov).setOnClickListener(
         view -> LovMultiSelect.startForResult(MainActivity.this,
             11,
             jobs,
             null,
-            typeface));
+            typeface,
+            Property.newBuilder()
+                .withButtonOkBackgroundDrawable(R.drawable.btn_ok_bg)
+                .withTagBackgroundColor(R.color.colorPrimary)
+                .withTagBorderColor(R.color.colorAccent)
+                .build()));
   }
 
 
