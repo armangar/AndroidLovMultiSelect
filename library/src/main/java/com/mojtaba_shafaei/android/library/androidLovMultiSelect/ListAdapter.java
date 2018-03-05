@@ -77,4 +77,44 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   void notifyDataSetChanged1() {
     notifyDataSetChanged();
   }
+
+  public void chooseItem(Item item) {
+    int position = -1;
+    int len = data.size();
+    for (int i = 0; i < len; i++) {
+      if (data.get(i).getDes().equals(item.getDes())) {
+        position = i;
+        break;
+      }
+    }
+
+    item.setChecked(true);
+    data.set(position, item);
+    notifyDataSetChanged();
+  }
+
+  public void chooseItems(List<? extends Item> selectedItems) {
+    if (selectedItems == null || selectedItems.size() == 0) {
+      return;
+    }
+
+    int len = data.size();
+    for (int i = 0; i < len; i++) {
+      Item item0 = data.get(i);
+      item0.setChecked(false);
+      data.set(i, item0);
+    }
+
+    for (int i = 0; i < len; i++) {
+      Item item0 = data.get(i);
+
+      for (Item item : selectedItems) {
+        if (item0.getDes().equals(item.getDes())) {
+          item0.setChecked(true);
+          data.set(i, item0);
+        }
+      }
+    }
+    notifyDataSetChanged1();
+  }
 }

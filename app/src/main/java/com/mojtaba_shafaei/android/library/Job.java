@@ -20,6 +20,12 @@ public class Job implements LovMultiSelect.Item {
     this.des = des;
   }
 
+  public Job(String cod, String des, boolean checked) {
+    this.cod = cod;
+    this.des = des;
+    this.checked = checked;
+  }
+
   @Override
   public String getCod() {
     return cod;

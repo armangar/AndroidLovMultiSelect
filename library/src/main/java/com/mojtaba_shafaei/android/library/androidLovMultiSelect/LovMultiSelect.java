@@ -2,7 +2,6 @@ package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build.VERSION;
@@ -60,6 +59,7 @@ public class LovMultiSelect extends AppCompatActivity {
   private ListAdapter listAdapter;
 
   private List<? extends Item> dataSet;
+  private List<Item> selectedItems;
   private TextWatcher textWatcher;
 
   private final BehaviorSubject<String> subject = BehaviorSubject.create();
@@ -72,20 +72,13 @@ public class LovMultiSelect extends AppCompatActivity {
 
   public static final String LOV_MULTI_SELECT_TRANSITION_NAME = "LOV_TRANSITION";
 
+  private final String KEY_SELECTED_ITEMS = "selectedItems";
+
   public interface Item extends Checkable {
 
     String getCod();
 
     String getDes();
-
-  }
-
-  public static void startForResult(Fragment fragment,
-      int requestCod,
-      @NonNull Collection<? extends Item> dataSet,
-      @Nullable View viewTransition) {
-    Intent starter = new Intent(fragment.getActivity(), LovMultiSelect.class);
-    fragment.startActivityForResult(starter, requestCod);
   }
 
   public static void startForResult(Activity activity,
@@ -93,11 +86,11 @@ public class LovMultiSelect extends AppCompatActivity {
       @NonNull Collection<? extends Item> dataSet,
       @Nullable View viewTransition,
       Typeface typeface,
-      Property params) {
+      Property uiParams) {
 
     Intent starter = new Intent(activity, LovMultiSelect.class);
     starter.putExtra("data", Parcels.wrap(dataSet));
-    starter.putExtra("properties", Parcels.wrap(params));
+    starter.putExtra("properties", Parcels.wrap(uiParams));
     defaultTypeface = typeface;
 
     if (VERSION.SDK_INT >= 21 && viewTransition != null) {
@@ -117,6 +110,17 @@ public class LovMultiSelect extends AppCompatActivity {
     ViewCompat.setLayoutDirection(findViewById(R.id.root), ViewCompat.LAYOUT_DIRECTION_RTL);
 
     dataSet = Parcels.unwrap(getIntent().getParcelableExtra("data"));
+
+    if (savedInstanceState == null) {
+      selectedItems = new LinkedList<>();
+      for (Item item : dataSet) {
+        if (item.isChecked()) {
+          selectedItems.add(item);
+        }
+      }
+    } else {
+      selectedItems = Parcels.unwrap(savedInstanceState.getParcelable(KEY_SELECTED_ITEMS));
+    }
 
     //<editor-fold desc="Ui Binding">
     toolbar = findViewById(R.id.toolbar);
@@ -198,8 +202,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
     listAdapter = new ListAdapter(this, (position, item) -> {
       if (item.isChecked()) {
-        tagView.addTag(item.getDes(), 0);
-        refreshSelectedCounter(tagView.getTags().size());
+        addTag(item);
       } else {
         removeTag(item.getDes());
       }
@@ -287,6 +290,21 @@ public class LovMultiSelect extends AppCompatActivity {
     );
 
     refreshSelectedCounter(0);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    listAdapter.chooseItems(selectedItems);
+    for (Item i : selectedItems) {
+      addTag(i);
+    }
+
+  }
+
+  private void addTag(Item item) {
+    tagView.addTag(item.getDes(), 0);
+    refreshSelectedCounter(tagView.getTags().size());
   }
 
   private void removeTag(String des) {
@@ -407,4 +425,17 @@ public class LovMultiSelect extends AppCompatActivity {
     return px;
   }
 
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    selectedItems.clear();
+    for (String des : tagView.getTags()) {
+      for (Item item : dataSet) {
+        if (des.equals(item.getDes())) {
+          selectedItems.add(item);
+        }
+      }
+    }
+    outState.putParcelable(KEY_SELECTED_ITEMS, Parcels.wrap(selectedItems));
+  }
 }

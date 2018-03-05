@@ -27,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
     jobs.add(new Job("5", "پنجمین آیتم از لیست موجود این میباشد"));
     jobs.add(new Job("6", "شش"));
     jobs.add(new Job("7", "SEVEN"));
-    jobs.add(new Job("8", "EIGHT"));
+    jobs.add(new Job("8", "EIGHT", true));
     jobs.add(new Job("9", "NINE"));
     jobs.add(new Job("10", "TEN"));
     jobs.add(new Job("11", "ELEVEN"));
-    jobs.add(new Job("12", "TWELVE"));
+    jobs.add(new Job("12", "TWELVE", true));
     jobs.add(new Job("13", "THIRTEEN"));
     jobs.add(new Job("14", "FOURTEEN"));
     jobs.add(new Job("15", "FIFTEEN"));
