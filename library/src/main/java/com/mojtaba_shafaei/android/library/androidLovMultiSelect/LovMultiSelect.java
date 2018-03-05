@@ -296,6 +296,7 @@ public class LovMultiSelect extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     listAdapter.chooseItems(selectedItems);
+    tagView.removeAllTags();
     for (Item i : selectedItems) {
       addTag(i);
     }
