@@ -9,6 +9,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -23,6 +24,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
 import android.widget.ProgressBar;
 import co.lujun.androidtagview.TagContainerLayout;
@@ -48,7 +51,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private View toolbar;
   private ProgressBar progressBar;
-  private AppCompatEditText searchView;
+  private TextInputEditText searchView;
   private AppCompatImageButton btnBack;
   private AppCompatImageButton btnClearSearch;
   private AppCompatButton btnOk;
@@ -132,7 +135,8 @@ public class LovMultiSelect extends AppCompatActivity {
     list = findViewById(R.id.list);
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
-    btnClearSearch.setVisibility(View.INVISIBLE);
+    btnClearSearch.setVisibility(View.GONE);
+    ViewCompat.setNestedScrollingEnabled(tagView, false);
     findViewById(R.id.spacer).setVisibility(
         getResources().getBoolean(R.bool.lov_multi_select_shadow_visible) ? View.VISIBLE
             : View.GONE);
@@ -221,7 +225,7 @@ public class LovMultiSelect extends AppCompatActivity {
       @Override
       public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         if (charSequence.length() == 0) {
-          btnClearSearch.setVisibility(View.INVISIBLE);
+          btnClearSearch.setVisibility(View.GONE);
         } else {
           btnClearSearch.setVisibility(View.VISIBLE);
         }
@@ -438,5 +442,26 @@ public class LovMultiSelect extends AppCompatActivity {
       }
     }
     outState.putParcelable(KEY_SELECTED_ITEMS, Parcels.wrap(selectedItems));
+  }
+
+  @Override
+  protected void onPause() {
+    hideKeyboard(getCurrentFocus());
+    super.onPause();
+  }
+
+  private void hideKeyboard(View view) {
+    if (view == null) {
+      return;
+    }
+    InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+    inputManager.hideSoftInputFromInputMethod(view.getWindowToken(), 0);
+    inputManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+
+    getWindow().setSoftInputMode(
+        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+    view.clearFocus();
+    view.setSelected(false);
   }
 }
