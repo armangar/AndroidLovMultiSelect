@@ -11,11 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -82,6 +82,27 @@ public class LovMultiSelect extends AppCompatActivity {
     String getCod();
 
     String getDes();
+  }
+
+  public static void startForResult(Fragment fragment,
+      int requestCod,
+      @NonNull Collection<? extends Item> dataSet,
+      @Nullable View viewTransition,
+      Typeface typeface,
+      Property uiParams) {
+
+    Intent starter = new Intent(fragment.getActivity(), LovMultiSelect.class);
+    starter.putExtra("data", Parcels.wrap(dataSet));
+    starter.putExtra("properties", Parcels.wrap(uiParams));
+    defaultTypeface = typeface;
+
+    if (VERSION.SDK_INT >= 21 && viewTransition != null) {
+      ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+          fragment.getActivity(), viewTransition, LOV_MULTI_SELECT_TRANSITION_NAME);
+      fragment.startActivityForResult(starter, requestCod, activityOptions.toBundle());
+    } else {
+      fragment.startActivityForResult(starter, requestCod);
+    }
   }
 
   public static void startForResult(Activity activity,
