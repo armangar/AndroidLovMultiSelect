@@ -200,7 +200,16 @@ public class LovMultiSelect extends AppCompatActivity {
 
     btnOk.setOnClickListener((view) -> {
       Intent result = new Intent();
-      result.putExtra("data", Parcels.wrap(listAdapter.getSelectedItems()));
+      List<Item> selectedItems = new LinkedList<>();
+      if (tagView.getTags() != null) {
+        for (String tagDes : tagView.getTags()) {
+          Item item = findItemInDataset(tagDes);
+          if (item != null) {
+            selectedItems.add(item);
+          }
+        }
+      }
+      result.putExtra("data", Parcels.wrap(selectedItems));
       setResult(RESULT_OK, result);
       if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
         getActivity().finishAfterTransition();
@@ -317,6 +326,15 @@ public class LovMultiSelect extends AppCompatActivity {
     refreshSelectedCounter(0);
   }
 
+  private Item findItemInDataset(String tagDes) {
+    for (Item i : dataSet) {
+      if (i.getDes().equals(tagDes)) {
+        return i;
+      }
+    }
+    return null;
+  }
+
   @Override
   protected void onResume() {
     super.onResume();
@@ -355,13 +373,18 @@ public class LovMultiSelect extends AppCompatActivity {
           .format(FA_LOCALE,
               getString(R.string.lov_multi_select_btn_ok_text),
               (properties != null && properties.getBtnOkText() != null) ? properties.getBtnOkText()
-                  : "انتخاب کن",
+                  : getString(R.string.lov_multi_select_choose_it),
               count)
       );
       btnOk.setEnabled(true);
     } else {
-      btnOk.setText(R.string.lov_multi_select_choose_at_least_one);
-      btnOk.setEnabled(false);
+      if (properties.isMandatory()) {
+        btnOk.setText(R.string.lov_multi_select_choose_at_least_one);
+        btnOk.setEnabled(false);
+      } else {
+        btnOk.setText(R.string.lov_multi_select_choose_it);
+        btnOk.setEnabled(true);
+      }
     }
 
 

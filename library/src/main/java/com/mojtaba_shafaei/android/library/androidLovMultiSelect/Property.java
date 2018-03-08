@@ -21,6 +21,8 @@ public final class Property {
 
   private String btnOkText = "";
 
+  private boolean mandatory = false;
+
   public Property() {
   }
 
@@ -29,6 +31,7 @@ public final class Property {
     tagBackgroundColor = builder.tagBackgroundColor;
     tagBorderColor = builder.tagBorderColor;
     btnOkText = builder.btnOkText;
+    mandatory = builder.mandatory;
   }
 
   public static Builder newBuilder() {
@@ -53,12 +56,17 @@ public final class Property {
     return btnOkText;
   }
 
+  public boolean isMandatory() {
+    return mandatory;
+  }
+
   public static final class Builder {
 
     private Integer buttonOkBackgroundDrawable;
     private Integer tagBackgroundColor;
     private Integer tagBorderColor;
     private String btnOkText;
+    private boolean mandatory;
 
     private Builder() {
     }
@@ -80,6 +88,11 @@ public final class Property {
 
     public Builder withBtnOkText(String text) {
       this.btnOkText = text;
+      return this;
+    }
+
+    public Builder withMandatory(boolean mandatory) {
+      this.mandatory = mandatory;
       return this;
     }
 
