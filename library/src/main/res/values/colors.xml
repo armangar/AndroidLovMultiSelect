@@ -11,4 +11,5 @@
   <color name="lov_multi_select_grey_percent_13">#212121</color>
   <color name="lov_multi_select_cross_color">#FFF</color>
   <color name="lov_multi_select_color_tag_background">#673695</color>
+  <color name="lov_multi_select_color_error">#F44336</color>
 </resources>

@@ -6,4 +6,9 @@
   <string name="lov_multi_select_btn_ok_text">%1$s  ( %2$d مورد )</string>
   <string name="lov_multi_select_choose_at_least_one">حداقل یک مورد انتخاب کنید…</string>
   <string name="lov_multi_select_choose_it">انتخاب کن</string>
+  <string name="lov_multi_select_back_button_error">%1$d مورد را انتخاب کرده اید.\n
+آیا تغییرات را ذخیره میکنید؟</string>
+  <string name="lov_multi_select_cancel_dialog_title">انصراف ؟</string>
+  <string name="lov_multi_select_no">خیر !</string>
+  <string name="lov_multi_select_yes_save">بله. ذخیره کن</string>
 </resources>

@@ -187,12 +187,37 @@ public class LovMultiSelect extends AppCompatActivity {
     }
 
     ViewCompat.setElevation(toolbar, dpToPx(4));
+
     btnBack.setOnClickListener((view) -> {
-      setResult(RESULT_CANCELED);
-      if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-        getActivity().finishAfterTransition();
+      int selectedTagsSize = tagView.getTags().size();
+      if (selectedTagsSize > 0) {
+        //dismiss all changes
+        BottomDialog.builder()
+            .withCancelable(true)
+            .withTitle(R.string.lov_multi_select_cancel_dialog_title)
+            .withIcon(R.drawable.lov_multi_select_ic_warning)
+            .withContent(String
+                .format(new Locale("fa"),
+                    getString(R.string.lov_multi_select_back_button_error),
+                    selectedTagsSize)
+            )
+            .withPositiveText(R.string.lov_multi_select_yes_save)
+            .withNegativeText(R.string.lov_multi_select_no,
+                R.color.lov_multi_select_color_error)
+            .withDirection(BottomDialog.RTL)
+            .withDefaultTypeface(defaultTypeface)
+            .withOnPositive(bottomDialog -> btnOk.performClick())
+            .withOnNegative(bottomDialog -> {
+              //No
+              bottomDialog.dismiss();
+              setResult(RESULT_CANCELED);
+              finishActivity();
+            })
+            .build()
+            .show(this);
       } else {
-        finish();
+        setResult(RESULT_CANCELED);
+        finishActivity();
       }
     });
 
@@ -211,11 +236,7 @@ public class LovMultiSelect extends AppCompatActivity {
       }
       result.putExtra("data", Parcels.wrap(selectedItems));
       setResult(RESULT_OK, result);
-      if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-        getActivity().finishAfterTransition();
-      } else {
-        finish();
-      }
+      finishActivity();
     });
 
     tagView.setOnTagClickListener(new OnTagClickListener() {
@@ -507,5 +528,13 @@ public class LovMultiSelect extends AppCompatActivity {
 
     view.clearFocus();
     view.setSelected(false);
+  }
+
+  public void finishActivity() {
+    if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+      finishAfterTransition();
+    } else {
+      finish();
+    }
   }
 }
