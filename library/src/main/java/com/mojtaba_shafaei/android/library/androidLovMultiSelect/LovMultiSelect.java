@@ -389,26 +389,32 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void refreshSelectedCounter(int count) {
-    if (count != 0) {
-      btnOk.setText(String
-          .format(FA_LOCALE,
-              getString(R.string.lov_multi_select_btn_ok_text),
-              (properties != null && properties.getBtnOkText() != null) ? properties.getBtnOkText()
-                  : getString(R.string.lov_multi_select_choose_it),
-              count)
+    if (properties.getMinLimit() != -1 && count < properties.getMinLimit()) {
+      btnOk.setText(
+          String.format(getString(R.string.lov_multi_select_choose_at_least_one),
+              properties.getMinLimit())
       );
-      btnOk.setEnabled(true);
+      btnOk.setEnabled(false);
+
     } else {
-      if (properties.isMandatory()) {
-        btnOk.setText(R.string.lov_multi_select_choose_at_least_one);
+      if (properties.getMaxLimit() != -1 && count > properties.getMaxLimit()) {
+        btnOk.setText(
+            String.format(getString(R.string.lov_multi_select_choose_at_most),
+                properties.getMaxLimit())
+        );
         btnOk.setEnabled(false);
       } else {
-        btnOk.setText(R.string.lov_multi_select_choose_it);
+        btnOk.setText(String
+            .format(FA_LOCALE,
+                getString(R.string.lov_multi_select_btn_ok_text),
+                (properties != null && properties.getBtnOkText() != null) ? properties
+                    .getBtnOkText()
+                    : getString(R.string.lov_multi_select_choose_it),
+                count)
+        );
         btnOk.setEnabled(true);
       }
     }
-
-
   }
 
   private void showError(Throwable e) {

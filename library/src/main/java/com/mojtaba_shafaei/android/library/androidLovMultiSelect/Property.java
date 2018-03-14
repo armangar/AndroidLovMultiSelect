@@ -2,6 +2,7 @@ package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IntRange;
 import org.parceler.Parcel;
 
 /**
@@ -21,7 +22,11 @@ public final class Property {
 
   private String btnOkText = "";
 
-  private boolean mandatory = false;
+  @IntRange(from = -1)
+  private int minLimit;
+
+  @IntRange(from = -1)
+  private int maxLimit;
 
   public Property() {
   }
@@ -31,7 +36,8 @@ public final class Property {
     tagBackgroundColor = builder.tagBackgroundColor;
     tagBorderColor = builder.tagBorderColor;
     btnOkText = builder.btnOkText;
-    mandatory = builder.mandatory;
+    minLimit = builder.minLimit;
+    maxLimit = builder.maxLimit;
   }
 
   public static Builder newBuilder() {
@@ -56,8 +62,12 @@ public final class Property {
     return btnOkText;
   }
 
-  public boolean isMandatory() {
-    return mandatory;
+  public int getMinLimit() {
+    return minLimit;
+  }
+
+  public int getMaxLimit() {
+    return maxLimit;
   }
 
   public static final class Builder {
@@ -66,7 +76,8 @@ public final class Property {
     private Integer tagBackgroundColor;
     private Integer tagBorderColor;
     private String btnOkText;
-    private boolean mandatory;
+    private int minLimit = -1;
+    private int maxLimit = -1;
 
     private Builder() {
     }
@@ -91,8 +102,23 @@ public final class Property {
       return this;
     }
 
-    public Builder withMandatory(boolean mandatory) {
-      this.mandatory = mandatory;
+    /**
+     * @param minLimit from -1 to .... <br/>
+     * -1 is default, and wont control minimum of selected items.In other word -1 make LOV Optional.
+     * @return {@link Builder} instance
+     */
+    public Builder withMinLimit(@IntRange(from = -1) int minLimit) {
+      this.minLimit = minLimit;
+      return this;
+    }
+
+    /**
+     * @param maxLimit from -1 to .... <br/>
+     * -1 is default, and wont control <strong>maximum</strong> of selected items.
+     * @return {@link Builder} instance
+     */
+    public Builder withMaxLimit(@IntRange(from = -1) int maxLimit) {
+      this.maxLimit = maxLimit;
       return this;
     }
 
