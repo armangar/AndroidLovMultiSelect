@@ -175,6 +175,10 @@ public class LovMultiSelect extends AppCompatActivity {
             properties.getButtonOkBackgroundDrawable()));
       }
 
+      if (properties.getButtonOkTextColorState() != null) {
+        btnOk.setTextColor(properties.getButtonOkTextColorState());
+      }
+
       if (properties.getTagBackgroundColor() != null) {
         tagView.setTagBackgroundColor(ContextCompat.getColor(this,
             properties.getTagBackgroundColor()));

@@ -1,5 +1,6 @@
 package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
 
+import android.content.res.ColorStateList;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntRange;
@@ -10,6 +11,8 @@ import org.parceler.Parcel;
  */
 @Parcel
 public final class Property {
+
+  private ColorStateList buttonOkTextColorState;
 
   @DrawableRes
   private Integer buttonOkBackgroundDrawable = null;
@@ -33,6 +36,7 @@ public final class Property {
 
   private Property(Builder builder) {
     buttonOkBackgroundDrawable = builder.buttonOkBackgroundDrawable;
+    buttonOkTextColorState = builder.buttonOkTextColorState;
     tagBackgroundColor = builder.tagBackgroundColor;
     tagBorderColor = builder.tagBorderColor;
     btnOkText = builder.btnOkText;
@@ -47,6 +51,10 @@ public final class Property {
   @DrawableRes
   public Integer getButtonOkBackgroundDrawable() {
     return buttonOkBackgroundDrawable;
+  }
+
+  public ColorStateList getButtonOkTextColorState() {
+    return buttonOkTextColorState;
   }
 
   @ColorRes
@@ -73,6 +81,7 @@ public final class Property {
   public static final class Builder {
 
     private Integer buttonOkBackgroundDrawable;
+    private ColorStateList buttonOkTextColorState;
     private Integer tagBackgroundColor;
     private Integer tagBorderColor;
     private String btnOkText;
@@ -82,17 +91,22 @@ public final class Property {
     private Builder() {
     }
 
-    public Builder withButtonOkBackgroundDrawable(Integer buttonOkBackgroundDrawable) {
+    public Builder withButtonOkBackgroundDrawable(@DrawableRes Integer buttonOkBackgroundDrawable) {
       this.buttonOkBackgroundDrawable = buttonOkBackgroundDrawable;
       return this;
     }
 
-    public Builder withTagBackgroundColor(Integer tagBackgroundColor) {
+    public Builder withButtonOkTextColor(ColorStateList buttonOkTextColorState) {
+      this.buttonOkTextColorState = buttonOkTextColorState;
+      return this;
+    }
+
+    public Builder withTagBackgroundColor(@ColorRes Integer tagBackgroundColor) {
       this.tagBackgroundColor = tagBackgroundColor;
       return this;
     }
 
-    public Builder withTagBorderColor(Integer tagBorderColor) {
+    public Builder withTagBorderColor(@ColorRes Integer tagBorderColor) {
       this.tagBorderColor = tagBorderColor;
       return this;
     }

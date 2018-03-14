@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 .withTagBackgroundColor(R.color.colorPrimary)
                 .withTagBorderColor(R.color.colorAccent)
                 .withBtnOkText("باشه")
+                    .withMinLimit(1)
                 .withMaxLimit(4)
                 .build()));
   }
