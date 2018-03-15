@@ -7,9 +7,8 @@
   <string name="lov_multi_select_choose_at_least_one">حداقل %d مورد انتخاب کنید…</string>
   <string name="lov_multi_select_choose_at_most">حداکثر %d مورد انتخاب کنید…</string>
   <string name="lov_multi_select_choose_it">انتخاب کن</string>
-  <string name="lov_multi_select_back_button_error">%1$d مورد را انتخاب کرده اید.\n
-آیا تغییرات را ذخیره میکنید؟</string>
+  <string name="lov_multi_select_do_you_save">آیا تغییرات را ذخیره میکنید؟</string>
   <string name="lov_multi_select_cancel_dialog_title">انصراف ؟</string>
-  <string name="lov_multi_select_no">خیر !</string>
-  <string name="lov_multi_select_yes_save">بله. ذخیره کن</string>
+  <string name="lov_multi_select_no">خیر. خارج میشوم!</string>
+  <string name="lov_multi_select_yes">بله</string>
 </resources>

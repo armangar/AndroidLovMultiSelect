@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 .withTagBorderColor(R.color.colorAccent)
                 .withBtnOkText("باشه")
                     .withMinLimit(1)
-                .withMaxLimit(4)
+                .withMaxLimit(3)
                 .build()));
   }
 

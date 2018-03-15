@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -192,38 +193,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
     ViewCompat.setElevation(toolbar, dpToPx(4));
 
-    btnBack.setOnClickListener((view) -> {
-      int selectedTagsSize = tagView.getTags().size();
-      if (selectedTagsSize > 0) {
-        //dismiss all changes
-        BottomDialog.builder()
-            .withCancelable(true)
-            .withTitle(R.string.lov_multi_select_cancel_dialog_title)
-            .withIcon(R.drawable.lov_multi_select_ic_warning)
-            .withContent(String
-                .format(new Locale("fa"),
-                    getString(R.string.lov_multi_select_back_button_error),
-                    selectedTagsSize)
-            )
-            .withPositiveText(R.string.lov_multi_select_yes_save)
-            .withNegativeText(R.string.lov_multi_select_no,
-                R.color.lov_multi_select_color_error)
-            .withDirection(BottomDialog.RTL)
-            .withDefaultTypeface(defaultTypeface)
-            .withOnPositive(bottomDialog -> btnOk.performClick())
-            .withOnNegative(bottomDialog -> {
-              //No
-              bottomDialog.dismiss();
-              setResult(RESULT_CANCELED);
-              finishActivity();
-            })
-            .build()
-            .show(this);
-      } else {
-        setResult(RESULT_CANCELED);
-        finishActivity();
-      }
-    });
+    btnBack.setOnClickListener((view) -> onBackPressed());
 
     btnClearSearch.setOnClickListener((view) -> searchView.setText(""));
 
@@ -546,5 +516,37 @@ public class LovMultiSelect extends AppCompatActivity {
     } else {
       finish();
     }
+  }
+
+  @Override
+  public void onBackPressed() {
+      //dismiss all changes
+      BottomDialog.builder()
+          .withCancelable(true)
+          .withTitle(R.string.lov_multi_select_cancel_dialog_title)
+          .withIcon(R.drawable.lov_multi_select_ic_warning)
+          .withContent(getContentString())
+          .withPositiveText(R.string.lov_multi_select_yes)
+          .withNegativeText(R.string.lov_multi_select_no,
+              R.color.lov_multi_select_color_error)
+          .withDirection(BottomDialog.RTL)
+          .withDefaultTypeface(defaultTypeface)
+          .withOnNegative(bottomDialog -> {
+            //No
+            setResult(RESULT_CANCELED);
+            finishActivity();
+          })
+          .build()
+          .show(this);
+  }
+
+  private String getContentString() {
+    StringBuilder content = new StringBuilder();
+
+    content.append("با خروج از این صفحه، دوباره باید موارد مورد نظرتان را انتخاب نمایید.")
+        .append("\n\n")
+        .append("در این صفحه ادامه میدهید؟");
+
+    return content.toString();
   }
 }
