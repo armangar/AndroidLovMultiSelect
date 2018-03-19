@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -62,7 +61,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private ListAdapter listAdapter;
 
-  private List<? extends Item> dataSet;
+  private List<Item> dataSet;
   private List<Item> selectedItems;
   private TextWatcher textWatcher;
 
@@ -347,47 +346,72 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void removeTag(String des) {
-    List<String> tags = tagView.getTags();
-    final int len = tags.size();
-    for (int i = 0; i < len; i++) {
-      if (tags.get(i).equals(des)) {
-        tags.remove(i);
-        break;
+    // Remove tag from tagViewGroup
+    List<String> tags = null;
+    try {
+      tags = tagView.getTags();
+      final int len = tags.size();
+      for (int i = 0; i < len; i++) {
+        if (tags.get(i).contentEquals(des)) {
+          tags.remove(i);
+          break;
+        }
       }
+      tagView.setTags(tags);
+    } catch (Exception e) {
+      Log.e(TAG, "removeTag: ", e);
     }
-
-    tagView.setTags(tags);
+    // Remove tag from adapter
     listAdapter.unCheckTag(des);
+
+    // Remove tag from dataSet
+    try {
+      final int len = dataSet.size();
+      for (int i = 0; i < len; i++) {
+        Item item = dataSet.get(i);
+        if (item.getDes().contentEquals(des)) {
+          item.setChecked(false);
+          dataSet.set(i, item);
+          break;
+        }
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "removeTag: ", e);
+    }
 
     refreshSelectedCounter(tagView.getTags().size());
   }
 
   private void refreshSelectedCounter(int count) {
-    if (properties.getMinLimit() != -1 && count < properties.getMinLimit()) {
-      btnOk.setText(
-          String.format(getString(R.string.lov_multi_select_choose_at_least_one),
-              properties.getMinLimit())
-      );
-      btnOk.setEnabled(false);
-
-    } else {
-      if (properties.getMaxLimit() != -1 && count > properties.getMaxLimit()) {
+    try {
+      if (properties.getMinLimit() != -1 && count < properties.getMinLimit()) {
         btnOk.setText(
-            String.format(getString(R.string.lov_multi_select_choose_at_most),
-                properties.getMaxLimit())
+            String.format(getString(R.string.lov_multi_select_choose_at_least_one),
+                properties.getMinLimit())
         );
         btnOk.setEnabled(false);
+
       } else {
-        btnOk.setText(String
-            .format(FA_LOCALE,
-                getString(R.string.lov_multi_select_btn_ok_text),
-                (properties != null && properties.getBtnOkText() != null) ? properties
-                    .getBtnOkText()
-                    : getString(R.string.lov_multi_select_choose_it),
-                count)
-        );
-        btnOk.setEnabled(true);
+        if (properties.getMaxLimit() != -1 && count > properties.getMaxLimit()) {
+          btnOk.setText(
+              String.format(getString(R.string.lov_multi_select_choose_at_most),
+                  properties.getMaxLimit())
+          );
+          btnOk.setEnabled(false);
+        } else {
+          btnOk.setText(String
+              .format(FA_LOCALE,
+                  getString(R.string.lov_multi_select_btn_ok_text),
+                  (properties != null && properties.getBtnOkText() != null) ? properties
+                      .getBtnOkText()
+                      : getString(R.string.lov_multi_select_choose_it),
+                  count)
+          );
+          btnOk.setEnabled(true);
+        }
       }
+    } catch (Exception e) {
+      Log.e(TAG, "refreshSelectedCounter: ", e);
     }
   }
 
@@ -520,24 +544,24 @@ public class LovMultiSelect extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
-      //dismiss all changes
-      BottomDialog.builder()
-          .withCancelable(true)
-          .withTitle(R.string.lov_multi_select_cancel_dialog_title)
-          .withIcon(R.drawable.lov_multi_select_ic_warning)
-          .withContent(getContentString())
-          .withPositiveText(R.string.lov_multi_select_yes)
-          .withNegativeText(R.string.lov_multi_select_no,
-              R.color.lov_multi_select_color_error)
-          .withDirection(BottomDialog.RTL)
-          .withDefaultTypeface(defaultTypeface)
-          .withOnNegative(bottomDialog -> {
-            //No
-            setResult(RESULT_CANCELED);
-            finishActivity();
-          })
-          .build()
-          .show(this);
+    //dismiss all changes
+    BottomDialog.builder()
+        .withCancelable(true)
+        .withTitle(R.string.lov_multi_select_cancel_dialog_title)
+        .withIcon(R.drawable.lov_multi_select_ic_warning)
+        .withContent(getContentString())
+        .withPositiveText(R.string.lov_multi_select_yes)
+        .withNegativeText(R.string.lov_multi_select_no,
+            R.color.lov_multi_select_color_error)
+        .withDirection(BottomDialog.RTL)
+        .withDefaultTypeface(defaultTypeface)
+        .withOnNegative(bottomDialog -> {
+          //No
+          setResult(RESULT_CANCELED);
+          finishActivity();
+        })
+        .build()
+        .show(this);
   }
 
   private String getContentString() {

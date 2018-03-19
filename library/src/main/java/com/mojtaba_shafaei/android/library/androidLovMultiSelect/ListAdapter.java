@@ -44,7 +44,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   public void setData(List<? extends Item> data) {
     this.data.clear();
     this.data.addAll(data);
-    notifyDataSetChanged1();
+    notifyDataSetChanged();
   }
 
   public List<Item> getSelectedItems() {
@@ -58,24 +58,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   }
 
   public void unCheckTag(String des) {
-    int position = -1;
     int len = data.size();
     for (int i = 0; i < len; i++) {
-      if (data.get(i).getDes().equals(des)) {
-        position = i;
+      Item item = data.get(i);
+      if (item.getDes().equals(des)) {
+        item.setChecked(false);
+        data.set(i, item);
+        notifyItemChanged(i);
         break;
       }
     }
-    Item item = data.get(position);
-    item.setChecked(false);
-
-    data.get(position).setChecked(false);
-    data.set(position, item);
-    notifyDataSetChanged();
-  }
-
-  void notifyDataSetChanged1() {
-    notifyDataSetChanged();
   }
 
   public void chooseItem(Item item) {
@@ -115,6 +107,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
         }
       }
     }
-    notifyDataSetChanged1();
+    notifyDataSetChanged();
   }
 }
