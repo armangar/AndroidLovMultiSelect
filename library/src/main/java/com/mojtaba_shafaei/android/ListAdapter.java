@@ -27,6 +27,11 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   }
 
   @Override
+  public long getItemId(int position) {
+    return data.get(position).hashCode();
+  }
+
+  @Override
   public ListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new ListHolder(inflater.inflate(R.layout.lov_multi_select_list_item, parent, false));
   }
@@ -52,9 +57,7 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
     holder.des.setOnClickListener(view -> {
       holder.des.toggle();
       item.setChecked(holder.des.isChecked());
-      //data.set(position, item);
-//      notifyItemChanged(position);
-//
+
       onCheckedChangeListener.onCheckedChanged(view, item, holder.des.isChecked());
     });
 
@@ -84,17 +87,8 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
     return items;
   }
 
-  public void unCheckTag(String des) {
-    int len = data.size();
-    for (int i = 0; i < len; i++) {
-      Item item = data.get(i);
-      if (item.getDes().equals(des)) {
-        item.setChecked(false);
-        data.set(i, item);
-        notifyItemChanged(i);
-        break;
-      }
-    }
+  public void refreshAdapter() {
+    notifyDataSetChanged();
   }
 
   public void chooseItem(Item item) {

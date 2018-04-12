@@ -199,7 +199,8 @@ public class LovMultiSelect extends AppCompatActivity {
                   .observeOn(Schedulers.computation()),
               (listLce, strings) -> {
                 if (listLce.hasError() || listLce.getData() == null) {
-                  return Lce.<Content>error(new NullPointerException("Error text"));
+                  return Lce.<Content>error(
+                      new NullPointerException("can not get list of source data"));
                 } else {
                   return Lce.data(new Content(listLce.getData(), strings));
                 }
@@ -263,7 +264,9 @@ public class LovMultiSelect extends AppCompatActivity {
 
       @Override
       public void onTagCrossClick(int position) {
-        removeTag(tagView.getTagText(position));
+        removeTagFromSelectedList(tagView.getTags().get(position));
+        listAdapter.refreshAdapter();
+        refreshSelectedCounter(tagView.getTags().size());
       }
     });
 
@@ -273,12 +276,15 @@ public class LovMultiSelect extends AppCompatActivity {
       if (isChecked) {
         addTag(item.getDes());
       } else {
-        removeTag(item.getDes());
+        removeTagFromSelectedList(item.getDes());
       }
     });
 
+    listAdapter.setHasStableIds(true);
+
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     recyclerView.setAdapter(listAdapter);
+    recyclerView.setHasFixedSize(true);
 
     //<editor-fold desc="Create Observable">
     final PublishRelay<String> subject = PublishRelay.create();
@@ -451,6 +457,20 @@ public class LovMultiSelect extends AppCompatActivity {
     //refreshSelectedCounter(0);
   }
 
+  private void removeTagFromSelectedList(String tag) {
+    List<String> tags = tagView.getTags();
+    if (tags != null) {
+      final int len = tags.size();
+      for (int i = 0; i < len; i++) {
+        if (tags.get(i).contentEquals(tag)) {
+          tags.remove(i);
+          break;
+        }
+      }
+      tagView.setTags(tags);
+    }
+  }
+
   private void hideErrors() {
     findViewById(R.id.tv_message).setVisibility(View.GONE);
   }
@@ -483,32 +503,6 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private void addTag(String des) {
     tagView.addTag(des, 0);
-    refreshSelectedCounter(tagView.getTags().size());
-  }
-
-  private void removeTag(String des) {
-    // Remove tag from tagViewGroup
-    List<String> tags;
-    try {
-      tags = tagView.getTags();
-      if (tags == null) {
-        tags = new ArrayList<>();
-      }
-
-      final int len = tags.size();
-      for (int i = 0; i < len; i++) {
-        if (tags.get(i).contentEquals(des)) {
-          tags.remove(i);
-          break;
-        }
-      }
-      tagView.setTags(tags);
-    } catch (Exception e) {
-      Log.e(TAG, "removeTag: ", e);
-    }
-    // Remove tag from adapter
-    listAdapter.unCheckTag(des);
-
     refreshSelectedCounter(tagView.getTags().size());
   }
 

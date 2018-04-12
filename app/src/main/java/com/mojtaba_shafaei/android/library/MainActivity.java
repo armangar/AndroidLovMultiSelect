@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 import com.mojtaba_shafaei.android.LovMultiSelect;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import com.mojtaba_shafaei.android.Property;
@@ -51,9 +52,12 @@ public class MainActivity extends AppCompatActivity {
     super.onActivityResult(requestCode, resultCode, data);
     if (resultCode == RESULT_OK) {
       List<Item> returnedData = Parcels.unwrap(data.getParcelableExtra("data"));
+      String result = "";
       for (Item dd : returnedData) {
         Log.d("MainActivity", "onActivityResult: " + dd);
+        result += dd.toString()+"\n\n";
       }
+      ((TextView) findViewById(R.id.tvResult)).setText(result);
     }
 
   }

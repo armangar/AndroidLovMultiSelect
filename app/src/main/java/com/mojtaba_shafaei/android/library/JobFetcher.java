@@ -1,6 +1,5 @@
 package com.mojtaba_shafaei.android.library;
 
-import android.os.SystemClock;
 import com.mojtaba_shafaei.android.Lce;
 import com.mojtaba_shafaei.android.LovMultiSelect;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
@@ -35,7 +34,7 @@ public class JobFetcher implements LovMultiSelect.FetchDataListener {
         .switchMap(data -> {
           return Observable.just(data);
         })
-       // .switchMap(data->Observable.error(new Exception("SALAM")))
+        // .switchMap(data->Observable.error(new Exception("SALAM")))
         ;
   }
 }
