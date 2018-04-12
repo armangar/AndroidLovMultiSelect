@@ -21,11 +21,11 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
+import android.widget.TextView;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView.OnTagClickListener;
 import com.jakewharton.rxrelay2.PublishRelay;
@@ -199,7 +199,7 @@ public class LovMultiSelect extends AppCompatActivity {
                   .observeOn(Schedulers.computation()),
               (listLce, strings) -> {
                 if (listLce.hasError() || listLce.getData() == null) {
-                  return Lce.<Content>error(new NullPointerException());
+                  return Lce.<Content>error(new NullPointerException("Error text"));
                 } else {
                   return Lce.data(new Content(listLce.getData(), strings));
                 }
@@ -221,7 +221,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 }
                 return Observable.just(Lce.data(result));
               } else {
-                return Observable.<Lce<List<Item>>>just(Lce.error(new Exception("")));
+                return Observable.<Lce<List<Item>>>just(Lce.error(new Exception("TET")));
               }
             }
           })
@@ -422,6 +422,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 }
                 setFormStatus(ViewStatus.READY);
                 showError(e);
+                Log.e(TAG, "onError: ", e);
               }
 
               @Override
@@ -451,7 +452,7 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void hideErrors() {
-
+    findViewById(R.id.tv_message).setVisibility(View.GONE);
   }
 
   private void showInternetError() {
@@ -547,16 +548,12 @@ public class LovMultiSelect extends AppCompatActivity {
   private void showError(Throwable e) {
     Log.e(TAG, "showError: ", e);
     try {
-      new BottomDialog.Builder()
-          .withHiddenHeader(true)
-          .withDirection(BottomDialog.RTL)
-          .withCancelable(false)
-          .withHiddenNegativeButton(true)
-          .withPositiveText(getString(R.string.lov_multi_select_i_got_it))
-          .withDefaultTypeface(sDefaultTypeface)
-          .withContent(e.getMessage())
-          .build()
-          .show(LovMultiSelect.this);
+      TextView tvMessage = findViewById(R.id.tv_message);
+      tvMessage.setVisibility(View.VISIBLE);
+      tvMessage.setTypeface(sDefaultTypeface);
+      tvMessage.setText(e.getMessage());
+      tvMessage
+          .setTextColor(ContextCompat.getColor(this, R.color.lov_multi_select_primaryTextDark));
 
     } catch (Exception error) {
       Log.e(TAG, "showErrors: " + error.getMessage(), error);
@@ -577,10 +574,6 @@ public class LovMultiSelect extends AppCompatActivity {
     }
   }
 
-  private Activity getActivity() {
-    return LovMultiSelect.this;
-  }
-
   @Override
   protected void onDestroy() {
     super.onDestroy();
@@ -588,16 +581,6 @@ public class LovMultiSelect extends AppCompatActivity {
       searchView.removeTextChangedListener(textWatcher);
     }
     sDefaultTypeface = null;
-  }
-
-  int dpToPx(int dp) {
-        /*DisplayMetrics displayMetrics = MyApplication.getInstance().getResources().getDisplayMetrics();
-        int px = Math.round((dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)) + .5f);*/
-
-    int px = (int) TypedValue
-        .applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
-
-    return px;
   }
 
   @Override

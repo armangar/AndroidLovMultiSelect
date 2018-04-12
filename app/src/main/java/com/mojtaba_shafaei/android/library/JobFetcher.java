@@ -33,9 +33,9 @@ public class JobFetcher implements LovMultiSelect.FetchDataListener {
     return Observable.just(Lce.data(jobs))
         .subscribeOn(Schedulers.io())
         .switchMap(data -> {
-          SystemClock.sleep(3000);//todo
           return Observable.just(data);
         })
+       // .switchMap(data->Observable.error(new Exception("SALAM")))
         ;
   }
 }
