@@ -413,7 +413,7 @@ public class LovMultiSelect extends AppCompatActivity {
 //                    listAdapter.setHighlightFor(splitDesiredHighlight);
                     listAdapter.setData(lce.getData().getList());
                     recyclerView.getLayoutManager().scrollToPosition(0);
-
+                    observeAdapter();
 //                    recyclerView.observeAdapter();
                   } else {
                     showInternetError();
@@ -455,6 +455,14 @@ public class LovMultiSelect extends AppCompatActivity {
     }
 
     //refreshSelectedCounter(0);
+  }
+
+  private void observeAdapter() {
+    if (listAdapter.getItemCount() == 0) {
+      showError(new Exception("مقداری یافت نشد"));
+    } else {
+      hideErrors();
+    }
   }
 
   private void removeTagFromSelectedList(String tag) {
@@ -540,11 +548,12 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void showError(Throwable e) {
-    Log.e(TAG, "showError: ", e);
     try {
       TextView tvMessage = findViewById(R.id.tv_message);
       tvMessage.setVisibility(View.VISIBLE);
-      tvMessage.setTypeface(sDefaultTypeface);
+      if (sDefaultTypeface != null) {
+        tvMessage.setTypeface(sDefaultTypeface);
+      }
       tvMessage.setText(e.getMessage());
       tvMessage
           .setTextColor(ContextCompat.getColor(this, R.color.lov_multi_select_primaryTextDark));
