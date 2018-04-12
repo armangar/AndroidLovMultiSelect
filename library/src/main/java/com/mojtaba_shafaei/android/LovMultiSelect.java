@@ -266,7 +266,7 @@ public class LovMultiSelect extends AppCompatActivity {
       public void onTagCrossClick(int position) {
         removeTagFromSelectedList(tagView.getTags().get(position));
         listAdapter.refreshAdapter();
-        refreshSelectedCounter(tagView.getTags().size());
+        refreshSelectedCounter();
       }
     });
 
@@ -413,7 +413,7 @@ public class LovMultiSelect extends AppCompatActivity {
 //                    listAdapter.setHighlightFor(splitDesiredHighlight);
                     listAdapter.setData(lce.getData().getList());
                     recyclerView.getLayoutManager().scrollToPosition(0);
-                    observeAdapter();
+                    refreshSelectedCounter();
 //                    recyclerView.observeAdapter();
                   } else {
                     showInternetError();
@@ -454,10 +454,12 @@ public class LovMultiSelect extends AppCompatActivity {
       }
     }
 
-    //refreshSelectedCounter(0);
+    refreshSelectedCounter();
   }
 
   private void observeAdapter() {
+    refreshSelectedCounter();
+
     if (listAdapter.getItemCount() == 0) {
       showError(new Exception("مقداری یافت نشد"));
     } else {
@@ -477,6 +479,7 @@ public class LovMultiSelect extends AppCompatActivity {
       }
       tagView.setTags(tags);
     }
+    observeAdapter();
   }
 
   private void hideErrors() {
@@ -504,17 +507,13 @@ public class LovMultiSelect extends AppCompatActivity {
     super.onResume();
   }
 
-  private void addTag(Item item) {
-    tagView.addTag(item.getDes(), 0);
-    refreshSelectedCounter(tagView.getTags().size());
-  }
-
   private void addTag(String des) {
     tagView.addTag(des, 0);
-    refreshSelectedCounter(tagView.getTags().size());
+    refreshSelectedCounter();
   }
 
-  private void refreshSelectedCounter(int count) {
+  private void refreshSelectedCounter() {
+    int count = tagView.getTags() != null ? tagView.getTags().size() : 0;
     try {
       if (sProperties.getMinLimit() != -1 && count < sProperties.getMinLimit()) {
         btnOk.setText(
@@ -584,6 +583,9 @@ public class LovMultiSelect extends AppCompatActivity {
       searchView.removeTextChangedListener(textWatcher);
     }
     sDefaultTypeface = null;
+    sLoader = null;
+    sDefaultItems = null;
+    sProperties = null;
   }
 
   @Override
