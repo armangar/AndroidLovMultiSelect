@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <dimen name="lov_multi_select_config_toolbar_height">128dp</dimen>
-  <dimen name="lov_multi_select_config_bottom_height">48dp</dimen>
-  <dimen name="lov_multi_select_listPreferredItemHeightSmall">48dp</dimen>
+    <dimen name="lov_multi_select_config_toolbar_height">128dp</dimen>
+    <dimen name="lov_multi_select_config_bottom_height">40dp</dimen>
+    <dimen name="lov_multi_select_listPreferredItemHeightSmall">48dp</dimen>
+    <dimen name="lov_multi_select_height_toolbar">56dp</dimen>
+    <dimen name="lov_multi_select_config_editText_height">48dp</dimen>
+    <dimen name="lov_multi_select_height_editText">48dp</dimen>
 </resources>

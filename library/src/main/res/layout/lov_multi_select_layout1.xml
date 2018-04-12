@@ -4,87 +4,117 @@
   android:id="@+id/root"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:background="#ECEFF1"
   android:transitionName="LOV_TRANSITION">
 
-  <android.support.constraint.ConstraintLayout
+  <android.support.v7.widget.CardView
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
-    android:background="#f5f5f5"
-    android:elevation="4dp"
-    android:minHeight="@dimen/lov_multi_select_config_toolbar_height"
-    android:translationZ="2dp">
+    android:layout_height="@dimen/lov_multi_select_height_toolbar"
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    app:cardBackgroundColor="#FFF"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="4dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true"
+    app:layout_constraintTop_toTopOf="parent">
 
-    <android.support.v7.widget.AppCompatImageButton
-      android:id="@+id/lov_multi_select_btn_back"
-      android:layout_width="@dimen/lov_multi_select_config_bottom_height"
-      android:layout_height="@dimen/lov_multi_select_config_bottom_height"
-      android:layout_marginRight="8dp"
-      android:background="@drawable/lov_multi_select_background_oval_dark_borderless"
-      android:scaleType="centerInside"
-      android:src="@drawable/lov_multi_select_ic_back_dark"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
 
-    <android.support.design.widget.TextInputEditText
-      android:id="@+id/search_view"
-      android:layout_width="0dp"
-      android:layout_height="48dp"
-      android:layout_marginLeft="0dp"
-      android:layout_marginRight="16dp"
-      android:gravity="right|center_vertical"
-      android:hint="@string/lov_multi_select_search"
-      android:textColor="@color/lov_multi_select_colors_text_dark"
-      android:textColorHint="@color/lov_multi_select_disabledAndHintTextLight"
-      app:layout_constraintLeft_toRightOf="@id/lov_multi_select_btn_clear_search"
-      app:layout_constraintRight_toLeftOf="@id/lov_multi_select_btn_back"
-      app:layout_constraintTop_toTopOf="parent"/>
+      <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <android.support.v7.widget.AppCompatImageButton
-      android:id="@+id/lov_multi_select_btn_clear_search"
-      android:layout_width="@dimen/lov_multi_select_config_bottom_height"
-      android:layout_height="@dimen/lov_multi_select_config_bottom_height"
-      android:layout_marginLeft="8dp"
-      android:background="@drawable/lov_multi_select_background_oval_dark_borderless"
-      android:scaleType="centerInside"
-      android:src="@drawable/lov_multi_select_ic_clear_light_theme"
-      android:visibility="visible"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
+        <android.support.v7.widget.AppCompatImageButton
+          android:id="@+id/lov_multi_select_btn_back"
+          android:layout_width="@dimen/lov_multi_select_config_bottom_height"
+          android:layout_height="@dimen/lov_multi_select_config_bottom_height"
+          android:layout_marginRight="8dp"
+          android:background="@drawable/lov_multi_select_background_oval_dark_borderless"
+          android:scaleType="centerInside"
+          android:src="@drawable/lov_multi_select_ic_back_dark"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintRight_toRightOf="parent"
+          app:layout_constraintTop_toTopOf="parent"/>
 
-    <android.support.v4.widget.ContentLoadingProgressBar
-      android:id="@+id/progressBar"
-      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-      android:layout_width="0dp"
-      android:layout_height="2dp"
-      android:indeterminate="true"
-      android:visibility="invisible"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/search_view"/>
+        <android.support.design.widget.TextInputEditText
+          android:id="@+id/search_view"
+          android:layout_width="0dp"
+          android:layout_height="@dimen/lov_multi_select_height_editText"
+          android:layout_marginLeft="8dp"
+          android:layout_marginRight="8dp"
+          android:gravity="right|center_vertical"
+          android:hint="@string/lov_multi_select_search"
+          android:imeOptions="actionSearch|flagNoExtractUi"
+          android:maxLines="1"
+          android:textColor="@color/lov_multi_select_colors_text_dark"
+          android:textColorHint="@color/lov_multi_select_disabledAndHintTextLight"
+          android:textSize="14sp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintLeft_toRightOf="@id/lov_multi_select_btn_clear_search"
+          app:layout_constraintRight_toLeftOf="@id/lov_multi_select_btn_back"
+          app:layout_constraintTop_toTopOf="parent"/>
+
+        <android.support.v7.widget.AppCompatImageButton
+          android:id="@+id/lov_multi_select_btn_clear_search"
+          android:layout_width="@dimen/lov_multi_select_config_bottom_height"
+          android:layout_height="@dimen/lov_multi_select_config_bottom_height"
+          android:layout_marginLeft="8dp"
+          android:background="@drawable/lov_multi_select_background_oval_dark_borderless"
+          android:scaleType="centerInside"
+          android:src="@drawable/lov_multi_select_ic_clear_light_theme"
+          android:visibility="visible"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintLeft_toLeftOf="parent"
+          app:layout_constraintTop_toTopOf="parent"/>
+      </android.support.constraint.ConstraintLayout>
+
+      <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-10dp"
+        android:layout_marginBottom="-10dp"
+        android:indeterminate="true"/>
+    </LinearLayout>
+  </android.support.v7.widget.CardView>
+
+  <android.support.v7.widget.CardView
+    android:id="@+id/tag_container"
+    android:layout_width="0dp"
+    android:layout_height="120dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    app:cardBackgroundColor="#FFF"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="4dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="4dp"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/toolbar">
 
     <android.support.v4.widget.NestedScrollView
-      android:id="@+id/tag_container"
-      android:layout_width="0dp"
-      android:layout_height="120dp"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
       android:fadeScrollbars="false"
       android:scrollbarAlwaysDrawVerticalTrack="true"
       android:scrollbarSize="2dp"
       android:scrollbars="vertical"
-      android:verticalScrollbarPosition="left"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/progressBar">
+      android:verticalScrollbarPosition="left">
 
       <co.lujun.androidtagview.TagContainerLayout
         android:id="@+id/tag_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
         android:visibility="visible"
         app:container_background_color="#0FFF"
         app:container_border_color="#FFF"
@@ -108,28 +138,19 @@
         app:tag_theme="none"
         app:vertical_interval="4dp"/>
     </android.support.v4.widget.NestedScrollView>
-
-  </android.support.constraint.ConstraintLayout>
-
-  <View
-    android:id="@+id/spacer"
-    android:layout_width="0dp"
-    android:layout_height="3dp"
-    android:background="@drawable/lov_multi_select_shadow"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+  </android.support.v7.widget.CardView>
 
   <android.support.v7.widget.RecyclerView
     android:id="@+id/list"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    android:background="@android:color/white"
-    android:visibility="visible"
+    android:layout_marginTop="-8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
     app:layout_constraintBottom_toTopOf="@id/lov_multi_select_btn_ok"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/spacer"/>
+    app:layout_constraintTop_toBottomOf="@id/tag_container"/>
 
   <android.support.v7.widget.AppCompatButton
     android:id="@+id/lov_multi_select_btn_ok"

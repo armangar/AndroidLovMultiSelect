@@ -50,10 +50,8 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private final String TAG = "LovMultiSelect";
 
-  private View toolbar;
   private ContentLoadingProgressBar progressBar;
   private TextInputEditText searchView;
-  private AppCompatImageButton btnBack;
   private AppCompatImageButton btnClearSearch;
   private AppCompatButton btnOk;
   private RecyclerView recyclerView;
@@ -151,20 +149,16 @@ public class LovMultiSelect extends AppCompatActivity {
     ViewCompat.setLayoutDirection(findViewById(R.id.root), ViewCompat.LAYOUT_DIRECTION_RTL);
 
     //<editor-fold desc="Ui Binding">
-    toolbar = findViewById(R.id.toolbar);
     progressBar = findViewById(R.id.progressBar);
     searchView = findViewById(R.id.search_view);
     btnClearSearch = findViewById(R.id.lov_multi_select_btn_clear_search);
-    btnBack = findViewById(R.id.lov_multi_select_btn_back);
+    AppCompatImageButton btnBack = findViewById(R.id.lov_multi_select_btn_back);
     btnOk = findViewById(R.id.lov_multi_select_btn_ok);
     recyclerView = findViewById(R.id.list);
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
     btnClearSearch.setVisibility(View.GONE);
     ViewCompat.setNestedScrollingEnabled(tagView, false);
-    findViewById(R.id.spacer).setVisibility(
-        getResources().getBoolean(R.bool.lov_multi_select_shadow_visible) ? View.VISIBLE
-            : View.GONE);
 
     if (sDefaultTypeface != null) {
       searchView.setTypeface(sDefaultTypeface);
@@ -192,8 +186,6 @@ public class LovMultiSelect extends AppCompatActivity {
             sProperties.getTagBorderColor()));
       }
     }
-
-    ViewCompat.setElevation(toolbar, dpToPx(4));
 
     btnBack.setOnClickListener((view) -> onBackPressed());
 
@@ -313,6 +305,7 @@ public class LovMultiSelect extends AppCompatActivity {
     disposable.add(
         subject.subscribeOn(Schedulers.io())
             .startWith(getQueryText())
+            .observeOn(AndroidSchedulers.mainThread())
             .map(query -> {
               if (query.isEmpty()) {
                 btnClearSearch.setVisibility(View.GONE);
@@ -339,9 +332,10 @@ public class LovMultiSelect extends AppCompatActivity {
                                 , query1)
                             );
                           }
-                        }))
+                        })
+                    .startWith(Lce.<ContentDataSetAndQueryText>loading()))
             .switchMap(lce -> {
-              if (!lce.hasError() && lce.getData().getQuery().length() > 0) {
+              if (!lce.hasError() && !lce.isLoading() && lce.getData().getQuery().length() > 0) {
                 final String fQuery = lce.getData().getQuery();
                 String[] queries = fQuery.split(SPACE);
                 //remove space and 1 char length parts
@@ -386,7 +380,6 @@ public class LovMultiSelect extends AppCompatActivity {
                 return Observable.just(lce);
               }
             })
-            .startWith(Lce.loading())
             .toFlowable(BackpressureStrategy.BUFFER)
             .toObservable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -467,9 +460,9 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private void showContentLoading(boolean b) {
     if (b) {
-      progressBar.setVisibility(View.VISIBLE);
+      progressBar.show();
     } else {
-      progressBar.setVisibility(View.GONE);
+      progressBar.hide();
     }
   }
 

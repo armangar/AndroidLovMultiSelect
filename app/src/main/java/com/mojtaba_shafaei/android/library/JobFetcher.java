@@ -1,5 +1,6 @@
 package com.mojtaba_shafaei.android.library;
 
+import android.os.SystemClock;
 import com.mojtaba_shafaei.android.Lce;
 import com.mojtaba_shafaei.android.LovMultiSelect;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
@@ -31,6 +32,10 @@ public class JobFetcher implements LovMultiSelect.FetchDataListener {
 
     return Observable.just(Lce.data(jobs))
         .subscribeOn(Schedulers.io())
+        .switchMap(data -> {
+          SystemClock.sleep(3000);//todo
+          return Observable.just(data);
+        })
         ;
   }
 }
