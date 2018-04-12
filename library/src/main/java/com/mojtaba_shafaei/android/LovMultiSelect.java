@@ -1,19 +1,18 @@
-package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
+package com.mojtaba_shafaei.android;
 
-import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
@@ -27,19 +26,21 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
-import android.widget.ProgressBar;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView.OnTagClickListener;
+import com.jakewharton.rxrelay2.PublishRelay;
 import com.mojtaba_shafaei.android.androidBottomDialog.BottomDialog;
+import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -50,51 +51,65 @@ public class LovMultiSelect extends AppCompatActivity {
   private final String TAG = "LovMultiSelect";
 
   private View toolbar;
-  private ProgressBar progressBar;
+  private ContentLoadingProgressBar progressBar;
   private TextInputEditText searchView;
   private AppCompatImageButton btnBack;
   private AppCompatImageButton btnClearSearch;
   private AppCompatButton btnOk;
-  private RecyclerView list;
+  private RecyclerView recyclerView;
   private TagContainerLayout tagView;
 
 
   private ListAdapter listAdapter;
 
-  private List<Item> dataSet;
-  private List<Item> selectedItems;
   private TextWatcher textWatcher;
 
-  private final BehaviorSubject<String> subject = BehaviorSubject.create();
   private final CompositeDisposable disposable = new CompositeDisposable();
-
   private final Locale FA_LOCALE = new Locale("fa");
 
-  public static Typeface defaultTypeface = null;
-  private Property properties;
+  protected static Typeface sDefaultTypeface = null;
+  private static Property sProperties;
+  private static FetchDataListener sLoader;
+  private static List<Item> sDefaultItems = new ArrayList<>();
 
   public static final String LOV_MULTI_SELECT_TRANSITION_NAME = "LOV_TRANSITION";
 
   private final String KEY_SELECTED_ITEMS = "selectedItems";
+  private final String SPACE = String.valueOf(' ');
 
   public interface Item extends Checkable {
 
-    String getCod();
+    String getCode();
 
     String getDes();
+
+    int getPriority();
+
+    void setCode(String code);
+
+    void setDes(String des);
+
+    void setPriority(int priority);
+  }
+
+  public interface FetchDataListener {
+
+    Observable<Lce<List<Item>>> fetch();
   }
 
   public static void startForResult(Fragment fragment,
       int requestCod,
-      @NonNull Collection<? extends Item> dataSet,
       @Nullable View viewTransition,
       Typeface typeface,
-      Property uiParams) {
+      Property uiParams,
+      FetchDataListener fetchDataListener,
+      List<Item> defaultItems) {
 
     Intent starter = new Intent(fragment.getActivity(), LovMultiSelect.class);
-    starter.putExtra("data", Parcels.wrap(dataSet));
-    starter.putExtra("properties", Parcels.wrap(uiParams));
-    defaultTypeface = typeface;
+    sDefaultTypeface = typeface;
+    sProperties = uiParams;
+    sLoader = fetchDataListener;
+    sDefaultItems = defaultItems;
 
     if (VERSION.SDK_INT >= 21 && viewTransition != null) {
       ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -107,15 +122,17 @@ public class LovMultiSelect extends AppCompatActivity {
 
   public static void startForResult(Activity activity,
       int requestCod,
-      @NonNull Collection<? extends Item> dataSet,
       @Nullable View viewTransition,
       Typeface typeface,
-      Property uiParams) {
+      Property uiParams,
+      FetchDataListener fetchDataListener,
+      List<Item> defaultItems) {
 
     Intent starter = new Intent(activity, LovMultiSelect.class);
-    starter.putExtra("data", Parcels.wrap(dataSet));
-    starter.putExtra("properties", Parcels.wrap(uiParams));
-    defaultTypeface = typeface;
+    sDefaultTypeface = typeface;
+    sProperties = uiParams;
+    sLoader = fetchDataListener;
+    sDefaultItems = defaultItems;
 
     if (VERSION.SDK_INT >= 21 && viewTransition != null) {
       ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -133,19 +150,6 @@ public class LovMultiSelect extends AppCompatActivity {
 
     ViewCompat.setLayoutDirection(findViewById(R.id.root), ViewCompat.LAYOUT_DIRECTION_RTL);
 
-    dataSet = Parcels.unwrap(getIntent().getParcelableExtra("data"));
-
-    if (savedInstanceState == null) {
-      selectedItems = new LinkedList<>();
-      for (Item item : dataSet) {
-        if (item.isChecked()) {
-          selectedItems.add(item);
-        }
-      }
-    } else {
-      selectedItems = Parcels.unwrap(savedInstanceState.getParcelable(KEY_SELECTED_ITEMS));
-    }
-
     //<editor-fold desc="Ui Binding">
     toolbar = findViewById(R.id.toolbar);
     progressBar = findViewById(R.id.progressBar);
@@ -153,7 +157,7 @@ public class LovMultiSelect extends AppCompatActivity {
     btnClearSearch = findViewById(R.id.lov_multi_select_btn_clear_search);
     btnBack = findViewById(R.id.lov_multi_select_btn_back);
     btnOk = findViewById(R.id.lov_multi_select_btn_ok);
-    list = findViewById(R.id.list);
+    recyclerView = findViewById(R.id.list);
     tagView = findViewById(R.id.tag_group);
     //</editor-fold>
     btnClearSearch.setVisibility(View.GONE);
@@ -162,31 +166,30 @@ public class LovMultiSelect extends AppCompatActivity {
         getResources().getBoolean(R.bool.lov_multi_select_shadow_visible) ? View.VISIBLE
             : View.GONE);
 
-    if (defaultTypeface != null) {
-      searchView.setTypeface(defaultTypeface);
-      btnOk.setTypeface(defaultTypeface);
-      tagView.setTagTypeface(defaultTypeface);
+    if (sDefaultTypeface != null) {
+      searchView.setTypeface(sDefaultTypeface);
+      btnOk.setTypeface(sDefaultTypeface);
+      tagView.setTagTypeface(sDefaultTypeface);
     }
 
-    properties = Parcels.unwrap(getIntent().getParcelableExtra("properties"));
-    if (properties != null) {
-      if (properties.getButtonOkBackgroundDrawable() != null) {
+    if (sProperties != null) {
+      if (sProperties.getButtonOkBackgroundDrawable() != null) {
         btnOk.setBackgroundDrawable(ContextCompat.getDrawable(this,
-            properties.getButtonOkBackgroundDrawable()));
+            sProperties.getButtonOkBackgroundDrawable()));
       }
 
-      if (properties.getButtonOkTextColorState() != null) {
-        btnOk.setTextColor(properties.getButtonOkTextColorState());
+      if (sProperties.getButtonOkTextColorState() != null) {
+        btnOk.setTextColor(sProperties.getButtonOkTextColorState());
       }
 
-      if (properties.getTagBackgroundColor() != null) {
+      if (sProperties.getTagBackgroundColor() != null) {
         tagView.setTagBackgroundColor(ContextCompat.getColor(this,
-            properties.getTagBackgroundColor()));
+            sProperties.getTagBackgroundColor()));
       }
 
-      if (properties.getTagBorderColor() != null) {
+      if (sProperties.getTagBorderColor() != null) {
         tagView.setTagBorderColor(ContextCompat.getColor(this,
-            properties.getTagBorderColor()));
+            sProperties.getTagBorderColor()));
       }
     }
 
@@ -197,19 +200,63 @@ public class LovMultiSelect extends AppCompatActivity {
     btnClearSearch.setOnClickListener((view) -> searchView.setText(""));
 
     btnOk.setOnClickListener((view) -> {
-      Intent result = new Intent();
-      List<Item> selectedItems = new LinkedList<>();
-      if (tagView.getTags() != null) {
-        for (String tagDes : tagView.getTags()) {
-          Item item = findItemInDataset(tagDes);
-          if (item != null) {
-            selectedItems.add(item);
-          }
-        }
-      }
-      result.putExtra("data", Parcels.wrap(selectedItems));
-      setResult(RESULT_OK, result);
-      finishActivity();
+      sLoader.fetch()
+          .subscribeOn(Schedulers.io())
+          .zipWith(Observable.just(tagView.getTags())
+                  .subscribeOn(AndroidSchedulers.mainThread())
+                  .observeOn(Schedulers.computation()),
+              (listLce, strings) -> {
+                if (listLce.hasError() || listLce.getData() == null) {
+                  return Lce.<Content>error(new NullPointerException());
+                } else {
+                  return Lce.data(new Content(listLce.getData(), strings));
+                }
+              })
+          .observeOn(Schedulers.computation())
+          .switchMap(lce -> {
+            if (lce.hasError() || lce.getData() == null) {
+              return Observable.<Lce<List<Item>>>just(Lce.error(lce.getError()));
+            } else {
+              if (lce.getData().getSelectedTags() != null) {
+                List<Item> result = new ArrayList<>();
+                for (String tagDes : lce.getData().getSelectedTags()) {
+                  for (Item item : lce.getData().getDataSet()) {
+                    if (item.getDes().contentEquals(tagDes)) {
+                      result.add(item);
+                      break;
+                    }
+                  }
+                }
+                return Observable.just(Lce.data(result));
+              } else {
+                return Observable.<Lce<List<Item>>>just(Lce.error(new Exception("")));
+              }
+            }
+          })
+          .observeOn(AndroidSchedulers.mainThread())
+          .subscribeWith(new DisposableObserver<Lce<List<Item>>>() {
+            @Override
+            public void onNext(Lce<List<Item>> lce) {
+              if (lce.hasError()) {
+                showError(lce.getError());
+              } else {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("data", Parcels.wrap(lce.getData()));
+                setResult(RESULT_OK, resultIntent);
+                finishActivity();
+              }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+          });
     });
 
     tagView.setOnTagClickListener(new OnTagClickListener() {
@@ -228,18 +275,21 @@ public class LovMultiSelect extends AppCompatActivity {
       }
     });
 
-    listAdapter = new ListAdapter(this, (position, item) -> {
-      if (item.isChecked()) {
-        addTag(item);
+    listAdapter = new ListAdapter(this
+        , () -> tagView.getTags()
+        , (view, item, isChecked) -> {
+      if (isChecked) {
+        addTag(item.getDes());
       } else {
         removeTag(item.getDes());
       }
     });
 
-    list.setLayoutManager(new LinearLayoutManager(this));
-    list.setAdapter(listAdapter);
-    listAdapter.setData(dataSet);
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    recyclerView.setAdapter(listAdapter);
 
+    //<editor-fold desc="Create Observable">
+    final PublishRelay<String> subject = PublishRelay.create();
     textWatcher = new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -248,12 +298,7 @@ public class LovMultiSelect extends AppCompatActivity {
 
       @Override
       public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        if (charSequence.length() == 0) {
-          btnClearSearch.setVisibility(View.GONE);
-        } else {
-          btnClearSearch.setVisibility(View.VISIBLE);
-        }
-        subject.onNext(charSequence.toString());
+        subject.accept(charSequence.toString());
       }
 
       @Override
@@ -261,11 +306,21 @@ public class LovMultiSelect extends AppCompatActivity {
 
       }
     };
+    //</editor-fold>
+
     searchView.addTextChangedListener(textWatcher);
 
     disposable.add(
-        subject
-            .subscribeOn(Schedulers.io())
+        subject.subscribeOn(Schedulers.io())
+            .startWith(getQueryText())
+            .map(query -> {
+              if (query.isEmpty()) {
+                btnClearSearch.setVisibility(View.GONE);
+              } else {
+                btnClearSearch.setVisibility(View.VISIBLE);
+              }
+              return query;
+            })
             .debounce(
                 getResources().getInteger(R.integer.lov_multi_select_config_debounce_duration),
                 TimeUnit.MILLISECONDS)
@@ -273,32 +328,98 @@ public class LovMultiSelect extends AppCompatActivity {
                 getResources().getInteger(R.integer.lov_multi_select_config_throttle_duration),
                 TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
-            .observeOn(AndroidSchedulers.mainThread())
-            .map(_data -> {
-              if (!disposable.isDisposed()) {
-                setFormStatus(ViewStatus.LOADING);
-              }
-              return _data;
-            })
-            .observeOn(Schedulers.computation())
-            .switchMap(query -> Observable.defer(() -> {
-              List<Item> items = findExpectedData(query);
-              if (items != null) {
-                return Observable.just(items);
+            .switchMap(query ->
+                Observable.just(query.toLowerCase())
+                    .zipWith(sLoader.fetch(),
+                        (BiFunction<String, Lce<List<Item>>, Lce<ContentDataSetAndQueryText>>) (query1, listLce) -> {
+                          if (listLce.hasError()) {
+                            return Lce.error(listLce.getError());
+                          } else {
+                            return Lce.data(new ContentDataSetAndQueryText(listLce.getData()
+                                , query1)
+                            );
+                          }
+                        }))
+            .switchMap(lce -> {
+              if (!lce.hasError() && lce.getData().getQuery().length() > 0) {
+                final String fQuery = lce.getData().getQuery();
+                String[] queries = fQuery.split(SPACE);
+                //remove space and 1 char length parts
+                List<String> ss = new ArrayList<>(Arrays.asList(queries));
+                for (Iterator<String> iterator = ss.iterator(); iterator.hasNext(); ) {
+                  if (iterator.next().length() <= 1) {
+                    iterator.remove();
+                  }
+                }
+                queries = new String[ss.size()];
+                ss.toArray(queries);
+                //
+                List<Item> results = new ArrayList<>();
+                int priority;
+                for (Item item : lce.getData().getList()) {
+                  priority = Integer.MAX_VALUE;
+                  for (String k : queries) {
+                    if (k.length() > 1) {
+                      if (item.getDes().toLowerCase().contains(k.toLowerCase())) {
+                        priority--;
+                      }
+                    }
+                  }
+
+                  if (item.getDes().contentEquals(fQuery)) {
+                    priority--;
+                  }
+
+                  if (item.getDes().toLowerCase().startsWith(fQuery)) {
+                    priority--;
+                  }
+
+                  item.setPriority(priority);
+                  //Add item if it is desired one.
+                  if (priority != Integer.MAX_VALUE) {
+                    results.add(item);
+                  }
+                }
+                lce.getData().setItems(results);
+                return Observable.just(lce);
               } else {
-                return Observable.error(new NetworkErrorException());
+                return Observable.just(lce);
               }
-            }))
+            })
+            .startWith(Lce.loading())
+            .toFlowable(BackpressureStrategy.BUFFER)
+            .toObservable()
             .observeOn(AndroidSchedulers.mainThread())
-            .onErrorReturnItem(new ArrayList<>())
-            .subscribeWith(new DisposableObserver<List<Item>>() {
+            .subscribeWith(new DisposableObserver<Lce<ContentDataSetAndQueryText>>() {
               @Override
-              public void onNext(List<Item> items) {
+              public void onNext(Lce<ContentDataSetAndQueryText> lce) {
                 if (isDisposed()) {
                   return;
                 }
-                setFormStatus(ViewStatus.READY);
-                refreshAdapter(items);
+                if (lce.isLoading()) {
+                  hideErrors();
+                  showContentLoading(true);
+
+                } else if (lce.hasError()) {
+                  showContentLoading(false);
+                  showInternetError();
+
+                } else {
+                  hideErrors();
+                  showContentLoading(false);
+                  if (lce.getData() != null) {
+                    String[] splitDesiredHighlight = searchView.getText().toString().trim()
+                        .split(SPACE);
+
+//                    listAdapter.setHighlightFor(splitDesiredHighlight);
+                    listAdapter.setData(lce.getData().getList());
+                    recyclerView.getLayoutManager().scrollToPosition(0);
+
+//                    recyclerView.observeAdapter();
+                  } else {
+                    showInternetError();
+                  }
+                }
               }
 
               @Override
@@ -317,27 +438,48 @@ public class LovMultiSelect extends AppCompatActivity {
             })
     );
 
-    refreshSelectedCounter(0);
-  }
-
-  private Item findItemInDataset(String tagDes) {
-    for (Item i : dataSet) {
-      if (i.getDes().equals(tagDes)) {
-        return i;
+    if (savedInstanceState == null) {
+      tagView.removeAllTags();
+      for (Item item : sDefaultItems) {
+        addTag(item.getDes());
+      }
+    } else {
+      List<CharSequence> savedTags = savedInstanceState
+          .getCharSequenceArrayList(KEY_SELECTED_ITEMS);
+      tagView.removeAllTags();
+      if (savedTags != null) {
+        for (CharSequence des : savedTags) {
+          addTag(des.toString());
+        }
       }
     }
-    return null;
+
+    //refreshSelectedCounter(0);
+  }
+
+  private void hideErrors() {
+
+  }
+
+  private void showInternetError() {
+    Log.e(TAG, "showInternetError: ");
+  }
+
+  private void showContentLoading(boolean b) {
+    if (b) {
+      progressBar.setVisibility(View.VISIBLE);
+    } else {
+      progressBar.setVisibility(View.GONE);
+    }
+  }
+
+  private String getQueryText() {
+    return searchView.getText().toString();
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    listAdapter.chooseItems(selectedItems);
-    tagView.removeAllTags();
-    for (Item i : selectedItems) {
-      addTag(i);
-    }
-
   }
 
   private void addTag(Item item) {
@@ -345,11 +487,20 @@ public class LovMultiSelect extends AppCompatActivity {
     refreshSelectedCounter(tagView.getTags().size());
   }
 
+  private void addTag(String des) {
+    tagView.addTag(des, 0);
+    refreshSelectedCounter(tagView.getTags().size());
+  }
+
   private void removeTag(String des) {
     // Remove tag from tagViewGroup
-    List<String> tags = null;
+    List<String> tags;
     try {
       tags = tagView.getTags();
+      if (tags == null) {
+        tags = new ArrayList<>();
+      }
+
       final int len = tags.size();
       for (int i = 0; i < len; i++) {
         if (tags.get(i).contentEquals(des)) {
@@ -364,45 +515,30 @@ public class LovMultiSelect extends AppCompatActivity {
     // Remove tag from adapter
     listAdapter.unCheckTag(des);
 
-    // Remove tag from dataSet
-    try {
-      final int len = dataSet.size();
-      for (int i = 0; i < len; i++) {
-        Item item = dataSet.get(i);
-        if (item.getDes().contentEquals(des)) {
-          item.setChecked(false);
-          dataSet.set(i, item);
-          break;
-        }
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "removeTag: ", e);
-    }
-
     refreshSelectedCounter(tagView.getTags().size());
   }
 
   private void refreshSelectedCounter(int count) {
     try {
-      if (properties.getMinLimit() != -1 && count < properties.getMinLimit()) {
+      if (sProperties.getMinLimit() != -1 && count < sProperties.getMinLimit()) {
         btnOk.setText(
             String.format(getString(R.string.lov_multi_select_choose_at_least_one),
-                properties.getMinLimit())
+                sProperties.getMinLimit())
         );
         btnOk.setEnabled(false);
 
       } else {
-        if (properties.getMaxLimit() != -1 && count > properties.getMaxLimit()) {
+        if (sProperties.getMaxLimit() != -1 && count > sProperties.getMaxLimit()) {
           btnOk.setText(
               String.format(getString(R.string.lov_multi_select_choose_at_most),
-                  properties.getMaxLimit())
+                  sProperties.getMaxLimit())
           );
           btnOk.setEnabled(false);
         } else {
           btnOk.setText(String
               .format(FA_LOCALE,
                   getString(R.string.lov_multi_select_btn_ok_text),
-                  (properties != null && properties.getBtnOkText() != null) ? properties
+                  (sProperties != null && sProperties.getBtnOkText() != null) ? sProperties
                       .getBtnOkText()
                       : getString(R.string.lov_multi_select_choose_it),
                   count)
@@ -416,6 +552,7 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void showError(Throwable e) {
+    Log.e(TAG, "showError: ", e);
     try {
       new BottomDialog.Builder()
           .withHiddenHeader(true)
@@ -423,7 +560,7 @@ public class LovMultiSelect extends AppCompatActivity {
           .withCancelable(false)
           .withHiddenNegativeButton(true)
           .withPositiveText(getString(R.string.lov_multi_select_i_got_it))
-          .withDefaultTypeface(defaultTypeface)
+          .withDefaultTypeface(sDefaultTypeface)
           .withContent(e.getMessage())
           .build()
           .show(LovMultiSelect.this);
@@ -433,48 +570,19 @@ public class LovMultiSelect extends AppCompatActivity {
     }
   }
 
-  private void refreshAdapter(List<Item> items) {
-    listAdapter.setData(items);
-  }
-
-  private List<Item> findExpectedData(String query) {
-    List<Item> result = new LinkedList<>();
-    for (Item item : this.dataSet) {
-      if (item.getDes().contains(query)) {
-        result.add(item);
-      }
-    }
-
-    return result;
-  }
-
   public void setFormStatus(int status) {
     switch (status) {
       case ViewStatus.READY: {
-        hideLoading();
-        hideErrors();
+        showContentLoading(false);
       }
       break;
 
       case ViewStatus.LOADING: {
-        showLoading();
+        showContentLoading(true);
       }
       break;
     }
   }
-
-  private void showLoading() {
-    progressBar.setVisibility(View.VISIBLE);
-  }
-
-  private void hideErrors() {
-
-  }
-
-  private void hideLoading() {
-    progressBar.setVisibility(View.INVISIBLE);
-  }
-
 
   private Activity getActivity() {
     return LovMultiSelect.this;
@@ -486,7 +594,7 @@ public class LovMultiSelect extends AppCompatActivity {
     if (textWatcher != null) {
       searchView.removeTextChangedListener(textWatcher);
     }
-    defaultTypeface = null;
+    sDefaultTypeface = null;
   }
 
   int dpToPx(int dp) {
@@ -502,15 +610,10 @@ public class LovMultiSelect extends AppCompatActivity {
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    selectedItems.clear();
-    for (String des : tagView.getTags()) {
-      for (Item item : dataSet) {
-        if (des.equals(item.getDes())) {
-          selectedItems.add(item);
-        }
-      }
+    if (tagView.getTags() != null) {
+      ArrayList<CharSequence> selectedTags = new ArrayList<>(tagView.getTags());
+      outState.putCharSequenceArrayList(KEY_SELECTED_ITEMS, selectedTags);
     }
-    outState.putParcelable(KEY_SELECTED_ITEMS, Parcels.wrap(selectedItems));
   }
 
   @Override
@@ -554,7 +657,7 @@ public class LovMultiSelect extends AppCompatActivity {
         .withNegativeText(R.string.lov_multi_select_no,
             R.color.lov_multi_select_color_error)
         .withDirection(BottomDialog.RTL)
-        .withDefaultTypeface(defaultTypeface)
+        .withDefaultTypeface(sDefaultTypeface)
         .withOnNegative(bottomDialog -> {
           //No
           setResult(RESULT_CANCELED);

@@ -5,9 +5,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect;
-import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect.Item;
-import com.mojtaba_shafaei.android.library.androidLovMultiSelect.Property;
+import com.mojtaba_shafaei.android.LovMultiSelect;
+import com.mojtaba_shafaei.android.LovMultiSelect.Item;
+import com.mojtaba_shafaei.android.Property;
 import java.util.ArrayList;
 import java.util.List;
 import org.parceler.Parcels;
@@ -19,29 +19,17 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    List<Job> jobs = new ArrayList<>();
-    jobs.add(new Job("1", "یک"));
-    jobs.add(new Job("2", "دو"));
-    jobs.add(new Job("3", "سه"));
-    jobs.add(new Job("4", "چهارمین آیتم از لیست موجود این است"));
-    jobs.add(new Job("5", "پنجمین آیتم از لیست موجود این میباشد"));
-    jobs.add(new Job("6", "شش"));
-    jobs.add(new Job("7", "SEVEN"));
-    jobs.add(new Job("8", "EIGHT", true));
-    jobs.add(new Job("9", "NINE"));
-    jobs.add(new Job("10", "TEN"));
-    jobs.add(new Job("11", "ELEVEN"));
-    jobs.add(new Job("12", "TWELVE", true));
-    jobs.add(new Job("13", "THIRTEEN"));
-    jobs.add(new Job("14", "FOURTEEN"));
-    jobs.add(new Job("15", "FIFTEEN"));
+    List<Job> defaults = new ArrayList<>();
+    defaults.add(new Job("1", "یک"));
+    defaults.add(new Job("5", "پنجمین آیتم از لیست موجود این میباشد"));
+    defaults.add(new Job("9", "NINE"));
+    defaults.add(new Job("14", "FOURTEEN"));
 
     Typeface typeface = Typeface.createFromAsset(getAssets(), "IRANSansMobile.ttf");
 
     findViewById(R.id.btn_call_lov).setOnClickListener(
         view -> LovMultiSelect.startForResult(MainActivity.this,
             11,
-            jobs,
             findViewById(R.id.btn_call_lov),
             typeface,
             Property.newBuilder()
@@ -49,9 +37,12 @@ public class MainActivity extends AppCompatActivity {
                 .withTagBackgroundColor(R.color.colorPrimary)
                 .withTagBorderColor(R.color.colorAccent)
                 .withBtnOkText("باشه")
-                    .withMinLimit(1)
+                .withMinLimit(1)
                 .withMaxLimit(3)
-                .build()));
+                .build(),
+            new JobFetcher(),
+            new ArrayList<>(defaults)
+        ));
   }
 
 

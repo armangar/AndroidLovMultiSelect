@@ -1,22 +1,29 @@
-package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
+package com.mojtaba_shafaei.android;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect.Item;
+import com.mojtaba_shafaei.android.LovMultiSelect.Item;
+import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
+class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
   private final List<Item> data = new LinkedList<>();
   private final LayoutInflater inflater;
-  private final OnListItemClickListener onListItemClickListener;
+  private final OnCheckedChangeListener onCheckedChangeListener;
+  @Nullable
+  private final SelectedTagsFetcher selectedTagsFetcher;
 
-  public ListAdapter(Context context, OnListItemClickListener onListItemClickListener) {
+  public ListAdapter(Context context
+      , @Nullable SelectedTagsFetcher selectedTagsFetcher
+      , OnCheckedChangeListener onCheckedChangeListener) {
     inflater = LayoutInflater.from(context);
-    this.onListItemClickListener = onListItemClickListener;
+    this.onCheckedChangeListener = onCheckedChangeListener;
+    this.selectedTagsFetcher = selectedTagsFetcher;
   }
 
   @Override
@@ -27,13 +34,33 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   @Override
   public void onBindViewHolder(ListHolder holder, int _position) {
     final int position = holder.getAdapterPosition();
-    Item item = data.get(position);
-    holder.initWith(data.get(position), (view, checked) -> {
-      item.setChecked(checked);
-      data.set(position, item);
+    final Item item = data.get(position);
 
-      onListItemClickListener.onListItemClicked(position, item);
+    holder.des.setText(item.getDes());
+    ////////////////////////////////
+    boolean checked = false;
+    if (selectedTagsFetcher != null) {
+      for (String tag : selectedTagsFetcher.fetch()) {
+        if (tag.contentEquals(item.getDes())) {
+          checked = true;
+          break;
+        }
+      }
+    }
+    holder.des.setChecked(checked);
+    //////////////////////////////////
+    holder.des.setOnClickListener(view -> {
+      holder.des.toggle();
+      item.setChecked(holder.des.isChecked());
+      //data.set(position, item);
+//      notifyItemChanged(position);
+//
+      onCheckedChangeListener.onCheckedChanged(view, item, holder.des.isChecked());
     });
+
+    if (LovMultiSelect.sDefaultTypeface != null) {
+      holder.des.setTypeface(LovMultiSelect.sDefaultTypeface);
+    }
   }
 
   @Override
@@ -41,7 +68,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListHolder> {
     return data.size();
   }
 
-  public void setData(List<? extends Item> data) {
+  public void setData(List<Item> data) {
     this.data.clear();
     this.data.addAll(data);
     notifyDataSetChanged();

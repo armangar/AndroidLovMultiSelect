@@ -1,4 +1,4 @@
-package com.mojtaba_shafaei.android.library.androidLovMultiSelect;
+package com.mojtaba_shafaei.android;
 
 import android.content.res.ColorStateList;
 import android.support.annotation.ColorRes;
@@ -9,7 +9,6 @@ import org.parceler.Parcel;
 /**
  * Created by mojtaba on 3/5/18.
  */
-@Parcel
 public final class Property {
 
   private ColorStateList buttonOkTextColorState;

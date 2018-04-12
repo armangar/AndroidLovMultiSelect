@@ -3,7 +3,7 @@
 
   <application>
     <activity
-      android:name=".LovMultiSelect"
+      android:name="com.mojtaba_shafaei.android.LovMultiSelect"
       android:theme="@style/Theme.AppCompat.Light.NoActionBar"
       android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
   </application>

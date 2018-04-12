@@ -1,6 +1,6 @@
 package com.mojtaba_shafaei.android.library;
 
-import com.mojtaba_shafaei.android.library.androidLovMultiSelect.LovMultiSelect;
+import com.mojtaba_shafaei.android.LovMultiSelect;
 import org.parceler.Parcel;
 
 /**
@@ -27,7 +27,27 @@ public class Job implements LovMultiSelect.Item {
   }
 
   @Override
-  public String getCod() {
+  public int getPriority() {
+    return 0;
+  }
+
+  @Override
+  public void setCode(String code) {
+
+  }
+
+  @Override
+  public void setDes(String des) {
+
+  }
+
+  @Override
+  public void setPriority(int priority) {
+
+  }
+
+  @Override
+  public String getCode() {
     return cod;
   }
 
