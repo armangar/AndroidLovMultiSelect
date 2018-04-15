@@ -7,8 +7,11 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
+import java.text.Collator;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
@@ -17,6 +20,7 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   private final OnCheckedChangeListener onCheckedChangeListener;
   @Nullable
   private final SelectedTagsFetcher selectedTagsFetcher;
+  private final Collator vCollator = Collator.getInstance(new Locale("fa"));
 
   public ListAdapter(Context context
       , @Nullable SelectedTagsFetcher selectedTagsFetcher
@@ -74,6 +78,10 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
   public void setData(List<Item> data) {
     this.data.clear();
     this.data.addAll(data);
+    Collections.sort(this.data, (item1, item2) ->
+        vCollator.compare(item1.getPriority() + ' ' + item1.getDes(),
+            item2.getPriority() + ' ' + item2.getDes())
+    );
     notifyDataSetChanged();
   }
 

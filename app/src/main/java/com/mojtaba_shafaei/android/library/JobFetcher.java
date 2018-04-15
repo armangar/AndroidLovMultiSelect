@@ -1,17 +1,12 @@
 package com.mojtaba_shafaei.android.library;
 
-import com.mojtaba_shafaei.android.Lce;
-import com.mojtaba_shafaei.android.LovMultiSelect;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
-import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JobFetcher implements LovMultiSelect.FetchDataListener {
+public class JobFetcher {
 
-  @Override
-  public Observable<Lce<List<Item>>> fetch() {
+  public List<Item> fetch() {
     List<Item> jobs = new ArrayList<>();
     jobs.add(new Job("1", "یک"));
     jobs.add(new Job("2", "دو"));
@@ -29,12 +24,6 @@ public class JobFetcher implements LovMultiSelect.FetchDataListener {
     jobs.add(new Job("14", "FOURTEEN"));
     jobs.add(new Job("15", "FIFTEEN"));
 
-    return Observable.just(Lce.data(jobs))
-        .subscribeOn(Schedulers.io())
-        .switchMap(data -> {
-          return Observable.just(data);
-        })
-        // .switchMap(data->Observable.error(new Exception("SALAM")))
-        ;
+    return jobs;
   }
 }

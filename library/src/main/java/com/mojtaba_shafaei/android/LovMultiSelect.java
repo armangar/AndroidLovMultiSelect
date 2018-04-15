@@ -67,13 +67,15 @@ public class LovMultiSelect extends AppCompatActivity {
 
   protected static Typeface sDefaultTypeface = null;
   private static Property sProperties;
-  private static FetchDataListener sLoader;
+  private static List<Item> sLoader;
   private static List<Item> sDefaultItems = new ArrayList<>();
 
   public static final String LOV_MULTI_SELECT_TRANSITION_NAME = "LOV_TRANSITION";
 
   private final String KEY_SELECTED_ITEMS = "selectedItems";
   private final String SPACE = String.valueOf(' ');
+
+  private Observable<Lce<List<Item>>> lceObservable;
 
   public interface Item extends Checkable {
 
@@ -90,9 +92,10 @@ public class LovMultiSelect extends AppCompatActivity {
     void setPriority(int priority);
   }
 
-  public interface FetchDataListener {
+  interface FetchDataListener {
 
-    Observable<Lce<List<Item>>> fetch();
+    //    Observable<Lce<List<Item>>> fetch();
+    List<Item> fetch();
   }
 
   public static void startForResult(Fragment fragment,
@@ -100,7 +103,7 @@ public class LovMultiSelect extends AppCompatActivity {
       @Nullable View viewTransition,
       Typeface typeface,
       Property uiParams,
-      FetchDataListener fetchDataListener,
+      List<Item> fetchDataListener,
       List<Item> defaultItems) {
 
     Intent starter = new Intent(fragment.getActivity(), LovMultiSelect.class);
@@ -123,7 +126,7 @@ public class LovMultiSelect extends AppCompatActivity {
       @Nullable View viewTransition,
       Typeface typeface,
       Property uiParams,
-      FetchDataListener fetchDataListener,
+      List<Item> fetchDataListener,
       List<Item> defaultItems) {
 
     Intent starter = new Intent(activity, LovMultiSelect.class);
@@ -191,8 +194,10 @@ public class LovMultiSelect extends AppCompatActivity {
 
     btnClearSearch.setOnClickListener((view) -> searchView.setText(""));
 
+    lceObservable = Observable.just(Lce.data(sLoader));
+
     btnOk.setOnClickListener((view) -> {
-      sLoader.fetch()
+      lceObservable
           .subscribeOn(Schedulers.io())
           .zipWith(Observable.just(tagView.getTags())
                   .subscribeOn(AndroidSchedulers.mainThread())
@@ -329,7 +334,7 @@ public class LovMultiSelect extends AppCompatActivity {
             .distinctUntilChanged()
             .switchMap(query ->
                 Observable.just(query.toLowerCase())
-                    .zipWith(sLoader.fetch(),
+                    .zipWith(lceObservable,
                         (BiFunction<String, Lce<List<Item>>, Lce<ContentDataSetAndQueryText>>) (query1, listLce) -> {
                           if (listLce.hasError()) {
                             return Lce.error(listLce.getError());

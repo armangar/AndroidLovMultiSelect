@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 .withMinLimit(1)
                 .withMaxLimit(3)
                 .build(),
-            new JobFetcher(),
+            new JobFetcher().fetch(),
             new ArrayList<>(defaults)
         ));
   }
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
       String result = "";
       for (Item dd : returnedData) {
         Log.d("MainActivity", "onActivityResult: " + dd);
-        result += dd.toString()+"\n\n";
+        result += dd.toString() + "\n\n";
       }
       ((TextView) findViewById(R.id.tvResult)).setText(result);
     }

@@ -1,7 +1,7 @@
 package com.mojtaba_shafaei.android;
 
 // Lce -> Loading / Content / Error
-public abstract class Lce<T> {
+abstract class Lce<T> {
 
   public static <T> Lce<T> data(T data) {
     return new Lce<T>() {
