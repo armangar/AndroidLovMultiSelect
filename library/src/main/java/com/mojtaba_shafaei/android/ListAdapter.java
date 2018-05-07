@@ -77,11 +77,13 @@ class ListAdapter extends RecyclerView.Adapter<ListHolder> {
 
   public void setData(List<Item> data) {
     this.data.clear();
-    this.data.addAll(data);
-    Collections.sort(this.data, (item1, item2) ->
-        vCollator.compare(item1.getPriority() + ' ' + item1.getDes(),
-            item2.getPriority() + ' ' + item2.getDes())
-    );
+    if (data != null) {
+      this.data.addAll(data);
+      Collections.sort(this.data, (item1, item2) ->
+          vCollator.compare(item1.getPriority() + ' ' + item1.getDes(),
+              item2.getPriority() + ' ' + item2.getDes())
+      );
+    }
     notifyDataSetChanged();
   }
 

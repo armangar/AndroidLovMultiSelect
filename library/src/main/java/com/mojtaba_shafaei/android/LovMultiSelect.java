@@ -332,6 +332,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 getResources().getInteger(R.integer.lov_multi_select_config_throttle_duration),
                 TimeUnit.MILLISECONDS)
             .distinctUntilChanged()
+            .observeOn(Schedulers.computation())
             .switchMap(query ->
                 Observable.just(query.toLowerCase())
                     .zipWith(lceObservable,
@@ -350,7 +351,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 final String fQuery = lce.getData().getQuery();
                 String[] queries = fQuery.split(SPACE);
                 //remove space and 1 char length parts
-                List<String> ss = new ArrayList<>(Arrays.asList(queries));
+                final List<String> ss = new ArrayList<>(Arrays.asList(queries));
                 for (Iterator<String> iterator = ss.iterator(); iterator.hasNext(); ) {
                   if (iterator.next().length() <= 1) {
                     iterator.remove();
@@ -359,7 +360,7 @@ public class LovMultiSelect extends AppCompatActivity {
                 queries = new String[ss.size()];
                 ss.toArray(queries);
                 //
-                List<Item> results = new ArrayList<>();
+                final List<Item> results = new ArrayList<>();
                 int priority;
                 for (Item item : lce.getData().getList()) {
                   priority = Integer.MAX_VALUE;
@@ -391,6 +392,8 @@ public class LovMultiSelect extends AppCompatActivity {
                 return Observable.just(lce);
               }
             })
+//            .onErrorResumeNext(
+//                Observable.just(Lce.data(new ContentDataSetAndQueryText(new ArrayList<>(), ""))))
             .toFlowable(BackpressureStrategy.BUFFER)
             .toObservable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -412,14 +415,9 @@ public class LovMultiSelect extends AppCompatActivity {
                   hideErrors();
                   showContentLoading(false);
                   if (lce.getData() != null) {
-                    String[] splitDesiredHighlight = searchView.getText().toString().trim()
-                        .split(SPACE);
-
-//                    listAdapter.setHighlightFor(splitDesiredHighlight);
                     listAdapter.setData(lce.getData().getList());
                     recyclerView.getLayoutManager().scrollToPosition(0);
                     refreshSelectedCounter();
-//                    recyclerView.observeAdapter();
                   } else {
                     showInternetError();
                   }
@@ -445,8 +443,10 @@ public class LovMultiSelect extends AppCompatActivity {
 
     if (savedInstanceState == null) {
       tagView.removeAllTags();
-      for (Item item : sDefaultItems) {
-        addTag(item.getDes());
+      if (sDefaultItems != null) {
+        for (Item item : sDefaultItems) {
+          addTag(item.getDes());
+        }
       }
     } else {
       List<CharSequence> savedTags = savedInstanceState
