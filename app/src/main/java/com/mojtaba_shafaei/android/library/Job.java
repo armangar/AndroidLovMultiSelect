@@ -9,8 +9,8 @@ import org.parceler.Parcel;
 @Parcel
 public class Job implements LovMultiSelect.Item {
 
-  private boolean checked;
-  private String cod, des;
+  boolean checked;
+  String cod, des;
 
   public Job() {
   }

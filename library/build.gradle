@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.9'
     annotationProcessor "org.parceler:parceler:1.1.9"
 
-    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.0.11'
+    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.0.12'
 
     // RxJava's dependency
     //implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
