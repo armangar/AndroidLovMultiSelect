@@ -29,11 +29,11 @@ dependencies {
     implementation "com.android.support:cardview-v7:$rootProject.ext.supportVersion"
     implementation "com.android.support:support-v4:$rootProject.ext.supportVersion"
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'org.parceler:parceler-api:1.1.9'
     annotationProcessor "org.parceler:parceler:1.1.9"
 
-    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.0.12'
+    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.1.1'
 
     // RxJava's dependency
     //implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
