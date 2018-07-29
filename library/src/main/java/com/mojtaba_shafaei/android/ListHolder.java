@@ -1,9 +1,8 @@
 package com.mojtaba_shafaei.android;
 
-import android.support.v7.widget.AppCompatCheckedTextView;
-import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
-import com.mojtaba_shafaei.android.LovMultiSelect.Item;
+import androidx.appcompat.widget.AppCompatCheckedTextView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
 
 class ListHolder extends ViewHolder {

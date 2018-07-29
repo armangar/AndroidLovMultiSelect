@@ -6,18 +6,6 @@ import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.ContentLoadingProgressBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,8 +14,20 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.ContentLoadingProgressBar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView.OnTagClickListener;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.jakewharton.rxrelay2.PublishRelay;
 import com.mojtaba_shafaei.android.androidBottomDialog.BottomDialog;
 import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
@@ -53,7 +53,7 @@ public class LovMultiSelect extends AppCompatActivity {
   private ContentLoadingProgressBar progressBar;
   private TextInputEditText searchView;
   private AppCompatImageButton btnClearSearch;
-  private AppCompatButton btnOk;
+  private MaterialButton btnOk;
   private RecyclerView recyclerView;
   private TagContainerLayout tagView;
 
@@ -163,6 +163,11 @@ public class LovMultiSelect extends AppCompatActivity {
     btnClearSearch.setVisibility(View.GONE);
     ViewCompat.setNestedScrollingEnabled(tagView, false);
 
+    btnClearSearch.setImageDrawable(
+        ContextCompat.getDrawable(this, R.drawable.lov_multi_select_ic_clear_light_theme));
+    btnBack.setImageDrawable(
+        ContextCompat.getDrawable(this, R.drawable.lov_multi_select_ic_back_dark));
+
     if (sDefaultTypeface != null) {
       searchView.setTypeface(sDefaultTypeface);
       btnOk.setTypeface(sDefaultTypeface);
@@ -197,64 +202,67 @@ public class LovMultiSelect extends AppCompatActivity {
     lceObservable = Observable.just(Lce.data(sLoader));
 
     btnOk.setOnClickListener((view) -> {
-      lceObservable
-          .subscribeOn(Schedulers.io())
-          .zipWith(Observable.just(tagView.getTags())
-                  .subscribeOn(AndroidSchedulers.mainThread())
-                  .observeOn(Schedulers.computation()),
-              (listLce, strings) -> {
-                if (listLce.hasError() || listLce.getData() == null) {
-                  return Lce.<Content>error(
-                      new NullPointerException("can not get list of source data"));
-                } else {
-                  return Lce.data(new Content(listLce.getData(), strings));
-                }
-              })
-          .observeOn(Schedulers.computation())
-          .switchMap(lce -> {
-            if (lce.hasError() || lce.getData() == null) {
-              return Observable.<Lce<List<Item>>>just(Lce.error(lce.getError()));
-            } else {
-              if (lce.getData().getSelectedTags() != null) {
-                List<Item> result = new ArrayList<>();
-                for (String tagDes : lce.getData().getSelectedTags()) {
-                  for (Item item : lce.getData().getDataSet()) {
-                    if (item.getDes().contentEquals(tagDes)) {
-                      result.add(item);
-                      break;
+      disposable.add(
+          lceObservable
+              .subscribeOn(Schedulers.io())
+              .zipWith(Observable.just(tagView.getTags())
+                      .subscribeOn(AndroidSchedulers.mainThread())
+                      .observeOn(Schedulers.computation()),
+                  (listLce, strings) -> {
+                    if (listLce.hasError() || listLce.getData() == null) {
+                      return Lce.<Content>error(
+                          new NullPointerException("can not get list of source data"));
+                    } else {
+                      return Lce.data(new Content(listLce.getData(), strings));
                     }
+                  })
+              .observeOn(Schedulers.computation())
+              .switchMap(lce -> {
+                if (lce.hasError() || lce.getData() == null) {
+                  return Observable.<Lce<List<Item>>>just(Lce.error(lce.getError()));
+                } else {
+                  if (lce.getData().getSelectedTags() != null) {
+                    List<Item> result = new ArrayList<>();
+                    for (String tagDes : lce.getData().getSelectedTags()) {
+                      for (Item item : lce.getData().getDataSet()) {
+                        if (item.getDes().contentEquals(tagDes)) {
+                          result.add(item);
+                          break;
+                        }
+                      }
+                    }
+                    return Observable.just(Lce.data(result));
+                  } else {
+                    return Observable.<Lce<List<Item>>>just(Lce.error(new Exception("TET")));
                   }
                 }
-                return Observable.just(Lce.data(result));
-              } else {
-                return Observable.<Lce<List<Item>>>just(Lce.error(new Exception("TET")));
-              }
-            }
-          })
-          .observeOn(AndroidSchedulers.mainThread())
-          .subscribeWith(new DisposableObserver<Lce<List<Item>>>() {
-            @Override
-            public void onNext(Lce<List<Item>> lce) {
-              if (lce.hasError()) {
-                showError(lce.getError());
-              } else {
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("data", Parcels.wrap(lce.getData()));
-                setResult(RESULT_OK, resultIntent);
-                finishActivity();
-              }
-            }
+              })
+              .observeOn(AndroidSchedulers.mainThread())
+              .doOnComplete(disposable::clear)
+              .subscribeWith(new DisposableObserver<Lce<List<Item>>>() {
+                @Override
+                public void onNext(Lce<List<Item>> lce) {
+                  if (lce.hasError()) {
+                    showError(lce.getError());
+                  } else {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("data", Parcels.wrap(lce.getData()));
+                    setResult(RESULT_OK, resultIntent);
+                    finishActivity();
+                  }
+                }
 
-            @Override
-            public void onError(Throwable e) {
+                @Override
+                public void onError(Throwable e) {
 
-            }
+                }
 
-            @Override
-            public void onComplete() {
+                @Override
+                public void onComplete() {
 
-            }
-          });
+                }
+              })
+      );
     });
 
     tagView.setOnTagClickListener(new OnTagClickListener() {
@@ -637,11 +645,11 @@ public class LovMultiSelect extends AppCompatActivity {
     BottomDialog.builder()
         .withCancelable(true)
         .withTitle(R.string.lov_multi_select_cancel_dialog_title)
-        .withIcon(R.drawable.lov_multi_select_ic_warning)
+        .withIcon(ContextCompat
+            .getDrawable(getApplicationContext(), R.drawable.lov_multi_select_ic_warning))
         .withContent(getContentString())
         .withPositiveText(R.string.lov_multi_select_yes)
-        .withNegativeText(R.string.lov_multi_select_no,
-            R.color.lov_multi_select_color_error)
+        .withNegativeText(R.string.lov_multi_select_no)
         .withDirection(BottomDialog.RTL)
         .withDefaultTypeface(sDefaultTypeface)
         .withOnNegative(bottomDialog -> {

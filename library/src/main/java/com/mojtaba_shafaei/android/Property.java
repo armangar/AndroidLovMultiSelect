@@ -1,9 +1,9 @@
 package com.mojtaba_shafaei.android;
 
 import android.content.res.ColorStateList;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntRange;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntRange;
 import org.parceler.Parcel;
 
 /**

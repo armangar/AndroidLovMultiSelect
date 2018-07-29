@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="lov_multi_select_EditText" parent="Base.Widget.AppCompat.EditText">
-        <item name="android:background">@drawable/lov_multi_select_frame</item>
-    </style>
+  <style name="lov_multi_select_EditText" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+  </style>
 
-    <style name="lov_multi_select_AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:progressBarStyle">@android:style/Widget.Holo.ProgressBar.Horizontal
-        </item>
-    </style>
+  <style name="lov_multi_select_AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <item name="android:progressBarStyle">@android:style/Widget.Holo.ProgressBar.Horizontal
+    </item>
+  </style>
 </resources>

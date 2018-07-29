@@ -1,10 +1,10 @@
 package com.mojtaba_shafaei.android;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
 import java.text.Collator;
