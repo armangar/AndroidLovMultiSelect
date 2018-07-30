@@ -1,6 +1,5 @@
 package com.mojtaba_shafaei.android.library;
 
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +11,6 @@ import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import com.mojtaba_shafaei.android.Property;
 import java.util.ArrayList;
 import java.util.List;
-import org.parceler.Parcels;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,11 +28,9 @@ public class MainActivity extends AppCompatActivity {
     Typeface typeface = Typeface.createFromAsset(getAssets(), "IRANSansMobile.ttf");
 
     findViewById(R.id.btn_call_lov).setOnClickListener(
-        view -> LovMultiSelect.startForResult(MainActivity.this,
-            11,
-            findViewById(R.id.btn_call_lov),
-            typeface,
-            Property.newBuilder()
+        view -> LovMultiSelect.start(getSupportFragmentManager()
+            , typeface
+            , Property.newBuilder()
                 .withButtonOkBackgroundTint(
                     ContextCompat.getColorStateList(this, R.color.colors_btn))
                 .withTagBackgroundColor(R.color.colorPrimary)
@@ -44,23 +40,21 @@ public class MainActivity extends AppCompatActivity {
                 .withMaxLimit(3)
                 .build(),
             new JobFetcher().fetch(),
-            new ArrayList<>(defaults)
+            new ArrayList<>(defaults),
+            items -> {
+              String result = "";
+              for (Item dd : items) {
+                Log.d("MainActivity", "onActivityResult: " + dd);
+                result += dd.toString() + "\n\n";
+              }
+              ((TextView) findViewById(R.id.tvResult)).setText(result);
+            }
+            , cancelListener -> {
+              Log.d("MainActivity", "cancelled");
+            }
+            , dismissListener -> {
+              Log.d("MainActivity", "dismissed");
+            }
         ));
-  }
-
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (resultCode == RESULT_OK) {
-      List<Item> returnedData = Parcels.unwrap(data.getParcelableExtra("data"));
-      String result = "";
-      for (Item dd : returnedData) {
-        Log.d("MainActivity", "onActivityResult: " + dd);
-        result += dd.toString() + "\n\n";
-      }
-      ((TextView) findViewById(R.id.tvResult)).setText(result);
-    }
-
   }
 }

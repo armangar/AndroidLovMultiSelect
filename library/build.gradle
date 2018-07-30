@@ -30,8 +30,6 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:$rootProject.ext.supportVersion"
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
-    implementation 'org.parceler:parceler-api:1.1.11'
-    annotationProcessor "org.parceler:parceler:1.1.11"
 
     implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.3.0'
 

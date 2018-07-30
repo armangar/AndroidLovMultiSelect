@@ -1,28 +1,39 @@
 package com.mojtaba_shafaei.android;
 
-import android.app.Activity;
-import android.content.Intent;
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Typeface;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Checkable;
-import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.core.app.ActivityOptionsCompat;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import co.lujun.androidtagview.TagContainerLayout;
@@ -45,18 +56,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import org.parceler.Parcels;
 
-public class LovMultiSelect extends AppCompatActivity {
+public class LovMultiSelect extends AppCompatDialogFragment {
 
-  private final String TAG = "LovMultiSelect";
+  private static final String TAG = "LovMultiSelect";
 
   private ContentLoadingProgressBar progressBar;
   private TextInputEditText searchView;
   private AppCompatImageButton btnClearSearch;
+  private AppCompatImageButton btnBack;
   private MaterialButton btnOk;
   private RecyclerView recyclerView;
   private TagContainerLayout tagView;
+  private AppCompatTextView tvMessage;
 
 
   private ListAdapter listAdapter;
@@ -66,17 +78,21 @@ public class LovMultiSelect extends AppCompatActivity {
   private final CompositeDisposable disposable = new CompositeDisposable();
   private final Locale FA_LOCALE = new Locale("fa");
 
-  protected static Typeface sDefaultTypeface = null;
-  private static Property sProperties;
-  private static List<Item> sLoader;
-  private static List<Item> sDefaultItems = new ArrayList<>();
+  static Typeface sDefaultTypeface = null;
+  private Property sProperties;
+  private List<Item> sLoader;
+  private List<Item> sDefaultItems = new ArrayList<>();
 
-  public static final String LOV_MULTI_SELECT_TRANSITION_NAME = "LOV_TRANSITION";
-
-  private final String KEY_SELECTED_ITEMS = "selectedItems";
   private final String SPACE = String.valueOf(' ');
 
   private Observable<Lce<List<Item>>> lceObservable;
+
+  ////////////////////////////    /////////////////////////////////////
+  private OnResultListener mOnResultListener;
+  private Dialog.OnCancelListener mOnCancelListener;
+  private Dialog.OnDismissListener mOnDismissListener;
+
+  ////////////////////////////    /////////////////////////////////////
 
   public interface Item extends Checkable {
 
@@ -93,81 +109,43 @@ public class LovMultiSelect extends AppCompatActivity {
     void setPriority(int priority);
   }
 
-  interface FetchDataListener {
-
-    //    Observable<Lce<List<Item>>> fetch();
-    List<Item> fetch();
-  }
-
-  public static void startForResult(Fragment fragment,
-      int requestCod,
-      @Nullable View viewTransition,
+  public static LovMultiSelect start(FragmentManager fragmentManager,
       Typeface typeface,
       Property uiParams,
       List<Item> fetchDataListener,
-      List<Item> defaultItems) {
+      List<Item> defaultItems,
+      OnResultListener onResultListener,
+      Dialog.OnCancelListener onCancelListener,
+      Dialog.OnDismissListener onDismissListener) {
 
-    Intent starter = new Intent(fragment.getActivity(), LovMultiSelect.class);
-    sDefaultTypeface = typeface;
-    sProperties = uiParams;
-    sLoader = fetchDataListener;
-    sDefaultItems = defaultItems;
+    LovMultiSelect dialog = new LovMultiSelect();
+    dialog.sDefaultTypeface = typeface;
+    dialog.sProperties = uiParams;
+    dialog.sLoader = fetchDataListener;
+    dialog.sDefaultItems = defaultItems;
+    dialog.mOnCancelListener = onCancelListener;
+    dialog.mOnDismissListener = onDismissListener;
+    dialog.mOnResultListener = onResultListener;
 
-    if (VERSION.SDK_INT >= 21 && viewTransition != null) {
-      ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
-          fragment.getActivity(), viewTransition, LOV_MULTI_SELECT_TRANSITION_NAME);
-      fragment.startActivityForResult(starter, requestCod, activityOptions.toBundle());
-    } else {
-      fragment.startActivityForResult(starter, requestCod);
-    }
-  }
-
-  public static void startForResult(Activity activity,
-      int requestCod,
-      @Nullable View viewTransition,
-      Typeface typeface,
-      Property uiParams,
-      List<Item> fetchDataListener,
-      List<Item> defaultItems) {
-
-    Intent starter = new Intent(activity, LovMultiSelect.class);
-    sDefaultTypeface = typeface;
-    sProperties = uiParams;
-    sLoader = fetchDataListener;
-    sDefaultItems = defaultItems;
-
-    if (VERSION.SDK_INT >= 21 && viewTransition != null) {
-      ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
-          activity, viewTransition, LOV_MULTI_SELECT_TRANSITION_NAME);
-      activity.startActivityForResult(starter, requestCod, activityOptions.toBundle());
-    } else {
-      activity.startActivityForResult(starter, requestCod);
-    }
+    dialog.show(fragmentManager, TAG);
+    return dialog;
   }
 
   @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
+  public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.lov_multi_select_layout1);
+    setStyle(DialogFragment.STYLE_NO_TITLE,
+        R.style.ThemeOverlay_AppCompat_Light);
+  }
 
-    ViewCompat.setLayoutDirection(findViewById(R.id.root), ViewCompat.LAYOUT_DIRECTION_RTL);
 
-    //<editor-fold desc="Ui Binding">
-    progressBar = findViewById(R.id.progressBar);
-    searchView = findViewById(R.id.search_view);
-    btnClearSearch = findViewById(R.id.lov_multi_select_btn_clear_search);
-    AppCompatImageButton btnBack = findViewById(R.id.lov_multi_select_btn_back);
-    btnOk = findViewById(R.id.lov_multi_select_btn_ok);
-    recyclerView = findViewById(R.id.list);
-    tagView = findViewById(R.id.tag_group);
-    //</editor-fold>
-    btnClearSearch.setVisibility(View.GONE);
-    ViewCompat.setNestedScrollingEnabled(tagView, false);
+  @Nullable
+  @Override
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup ignored,
+      @Nullable Bundle savedInstanceState) {
 
-    btnClearSearch.setImageDrawable(
-        ContextCompat.getDrawable(this, R.drawable.lov_multi_select_ic_clear_light_theme));
-    btnBack.setImageDrawable(
-        ContextCompat.getDrawable(this, R.drawable.lov_multi_select_ic_back_dark));
+    View view = inflater.inflate(R.layout.lov_multi_select_layout1, null);
+    initUi(view);
 
     if (sDefaultTypeface != null) {
       searchView.setTypeface(sDefaultTypeface);
@@ -186,23 +164,23 @@ public class LovMultiSelect extends AppCompatActivity {
       }
 
       if (sProperties.getTagBackgroundColor() != null) {
-        tagView.setTagBackgroundColor(ContextCompat.getColor(this,
+        tagView.setTagBackgroundColor(ContextCompat.getColor(getContext(),
             sProperties.getTagBackgroundColor()));
       }
 
       if (sProperties.getTagBorderColor() != null) {
-        tagView.setTagBorderColor(ContextCompat.getColor(this,
+        tagView.setTagBorderColor(ContextCompat.getColor(getContext(),
             sProperties.getTagBorderColor()));
       }
     }
 
-    btnBack.setOnClickListener((view) -> onBackPressed());
+    btnBack.setOnClickListener((ignored1) -> onBackPressed());
 
-    btnClearSearch.setOnClickListener((view) -> searchView.setText(""));
+    btnClearSearch.setOnClickListener((ignored2) -> searchView.setText(""));
 
     lceObservable = Observable.just(Lce.data(sLoader));
 
-    btnOk.setOnClickListener((view) -> {
+    btnOk.setOnClickListener((ignored3) -> {
       disposable.add(
           lceObservable
               .subscribeOn(Schedulers.io())
@@ -240,27 +218,12 @@ public class LovMultiSelect extends AppCompatActivity {
               })
               .observeOn(AndroidSchedulers.mainThread())
               .doOnComplete(disposable::clear)
-              .subscribeWith(new DisposableObserver<Lce<List<Item>>>() {
-                @Override
-                public void onNext(Lce<List<Item>> lce) {
-                  if (lce.hasError()) {
-                    showError(lce.getError());
-                  } else {
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("data", Parcels.wrap(lce.getData()));
-                    setResult(RESULT_OK, resultIntent);
-                    finishActivity();
-                  }
-                }
-
-                @Override
-                public void onError(Throwable e) {
-
-                }
-
-                @Override
-                public void onComplete() {
-
+              .doOnError(this::showError)
+              .subscribe(lce -> {
+                if (lce.hasError()) {
+                  showError(lce.getError());
+                } else {
+                  onResult(lce.getData());
                 }
               })
       );
@@ -284,9 +247,9 @@ public class LovMultiSelect extends AppCompatActivity {
       }
     });
 
-    listAdapter = new ListAdapter(this
+    listAdapter = new ListAdapter(getContext()
         , () -> tagView.getTags()
-        , (view, item, isChecked) -> {
+        , (ignored5, item, isChecked) -> {
       if (isChecked) {
         addTag(item.getDes());
       } else {
@@ -296,12 +259,29 @@ public class LovMultiSelect extends AppCompatActivity {
 
     listAdapter.setHasStableIds(true);
 
-    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     recyclerView.setAdapter(listAdapter);
     recyclerView.setHasFixedSize(true);
 
-    //<editor-fold desc="Create Observable">
-    final PublishRelay<String> subject = PublishRelay.create();
+    try {
+      tagView.removeAllTags();
+      if (sDefaultItems != null) {
+        for (Item item : sDefaultItems) {
+          addTag(item.getDes());
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    refreshSelectedCounter();
+    return view;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    PublishRelay<String> subject = PublishRelay.create();
     textWatcher = new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -318,7 +298,6 @@ public class LovMultiSelect extends AppCompatActivity {
 
       }
     };
-    //</editor-fold>
 
     searchView.addTextChangedListener(textWatcher);
 
@@ -449,26 +428,46 @@ public class LovMultiSelect extends AppCompatActivity {
               }
             })
     );
+  }
 
-    if (savedInstanceState == null) {
-      tagView.removeAllTags();
-      if (sDefaultItems != null) {
-        for (Item item : sDefaultItems) {
-          addTag(item.getDes());
-        }
-      }
-    } else {
-      List<CharSequence> savedTags = savedInstanceState
-          .getCharSequenceArrayList(KEY_SELECTED_ITEMS);
-      tagView.removeAllTags();
-      if (savedTags != null) {
-        for (CharSequence des : savedTags) {
-          addTag(des.toString());
-        }
-      }
-    }
+  private void initUi(View root) {
+    //<editor-fold desc="Ui Binding">
+    progressBar = root.findViewById(R.id.progressBar);
+    searchView = root.findViewById(R.id.search_view);
+    btnClearSearch = root.findViewById(R.id.lov_multi_select_btn_clear_search);
+    btnBack = root.findViewById(R.id.lov_multi_select_btn_back);
+    btnOk = root.findViewById(R.id.lov_multi_select_btn_ok);
+    recyclerView = root.findViewById(R.id.list);
+    tagView = root.findViewById(R.id.tag_group);
+    tvMessage = root.findViewById(R.id.tv_message);
+    //</editor-fold>
+    btnClearSearch.setVisibility(View.GONE);
+    ViewCompat.setNestedScrollingEnabled(tagView, false);
 
-    refreshSelectedCounter();
+    btnClearSearch.setImageDrawable(
+        ContextCompat.getDrawable(getContext(), R.drawable.lov_multi_select_ic_clear_light_theme));
+    btnBack.setImageDrawable(
+        ContextCompat.getDrawable(getContext(), R.drawable.lov_multi_select_ic_back_dark));
+
+    ViewCompat.setLayoutDirection(root, ViewCompat.LAYOUT_DIRECTION_RTL);
+
+    progressBar.setVisibility(View.GONE);
+    searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+
+    btnBack.getViewTreeObserver()
+        .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+          @Override
+          public void onGlobalLayout() {
+            if (btnBack.getViewTreeObserver().isAlive()) {
+              btnBack.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+              ObjectAnimator animator = ObjectAnimator.ofFloat(btnBack, "translationX", 0);
+              animator.setInterpolator(new DecelerateInterpolator(1.5F));
+              animator.setStartDelay(500);
+              animator.setDuration(300);
+              animator.start();
+            }
+          }
+        });
   }
 
   private void observeAdapter() {
@@ -497,7 +496,7 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   private void hideErrors() {
-    findViewById(R.id.tv_message).setVisibility(View.GONE);
+    tvMessage.setVisibility(View.GONE);
   }
 
   private void showInternetError() {
@@ -514,11 +513,6 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private String getQueryText() {
     return searchView.getText().toString();
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();
   }
 
   private void addTag(String des) {
@@ -562,14 +556,14 @@ public class LovMultiSelect extends AppCompatActivity {
 
   private void showError(Throwable e) {
     try {
-      TextView tvMessage = findViewById(R.id.tv_message);
       tvMessage.setVisibility(View.VISIBLE);
       if (sDefaultTypeface != null) {
         tvMessage.setTypeface(sDefaultTypeface);
       }
       tvMessage.setText(e.getMessage());
       tvMessage
-          .setTextColor(ContextCompat.getColor(this, R.color.lov_multi_select_primaryTextDark));
+          .setTextColor(
+              ContextCompat.getColor(getContext(), R.color.lov_multi_select_primaryTextDark));
 
     } catch (Exception error) {
       Log.e(TAG, "showErrors: " + error.getMessage(), error);
@@ -591,63 +585,69 @@ public class LovMultiSelect extends AppCompatActivity {
   }
 
   @Override
-  protected void onDestroy() {
-    super.onDestroy();
+  public void onPause() {
+    hideSoftKeyboard(searchView);
+    disposable.clear();
+
+    super.onPause();
+    dismissAllowingStateLoss();
+  }
+
+  @Override
+  public void onDismiss(DialogInterface dialog) {
+    if (mOnDismissListener != null) {
+      mOnDismissListener.onDismiss(dialog);
+    }
+    super.onDismiss(dialog);
+  }
+
+  @Override
+  public void onCancel(DialogInterface dialog) {
+    if (mOnCancelListener != null) {
+      mOnCancelListener.onCancel(dialog);
+    }
+    super.onCancel(dialog);
+  }
+
+  private void onResult(List<Item> data) {
+    if (mOnResultListener != null) {
+      mOnResultListener.onResult(data);
+    }
+    dismissAllowingStateLoss();
+  }
+
+  @Override
+  public void onDestroy() {
     if (textWatcher != null) {
       searchView.removeTextChangedListener(textWatcher);
+      textWatcher = null;
     }
     sDefaultTypeface = null;
     sLoader = null;
     sDefaultItems = null;
     sProperties = null;
+    super.onDestroy();
   }
 
-  @Override
-  protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    if (tagView.getTags() != null) {
-      ArrayList<CharSequence> selectedTags = new ArrayList<>(tagView.getTags());
-      outState.putCharSequenceArrayList(KEY_SELECTED_ITEMS, selectedTags);
+  private void hideSoftKeyboard(AppCompatEditText searchView) {
+    if (searchView != null) {
+      InputMethodManager inputManager = (InputMethodManager)
+          searchView.getContext().getSystemService(INPUT_METHOD_SERVICE);
+      inputManager.hideSoftInputFromInputMethod(searchView.getWindowToken(), 0);
+      inputManager.hideSoftInputFromWindow(searchView.getApplicationWindowToken(), 0);
+
+      getDialog().getWindow().setSoftInputMode(
+          WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+      searchView.clearFocus();
+      searchView.setSelected(false);
     }
   }
 
-  @Override
-  protected void onPause() {
-    hideKeyboard(getCurrentFocus());
-    super.onPause();
-  }
-
-  private void hideKeyboard(View view) {
-    if (view == null) {
-      return;
-    }
-    InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-    inputManager.hideSoftInputFromInputMethod(view.getWindowToken(), 0);
-    inputManager.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
-
-    getWindow().setSoftInputMode(
-        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
-    view.clearFocus();
-    view.setSelected(false);
-  }
-
-  public void finishActivity() {
-    if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-      finishAfterTransition();
-    } else {
-      finish();
-    }
-  }
-
-  @Override
   public void onBackPressed() {
     //dismiss all changes
     BottomDialog.builder()
         .withCancelable(true)
-        /*.withTitle(R.string.lov_multi_select_cancel_dialog_title)
-        .withIcon(ContextCompat
-            .getDrawable(getApplicationContext(), R.drawable.lov_multi_select_ic_warning))*/
         .withHiddenHeader(true)
         .withContent(getContentString())
         .withPositiveText(R.string.lov_multi_select_yes)
@@ -655,9 +655,33 @@ public class LovMultiSelect extends AppCompatActivity {
         .withDirection(BottomDialog.RTL)
         .withDefaultTypeface(sDefaultTypeface)
         .withOnNegative(bottomDialog -> {
-          //No
-          setResult(RESULT_CANCELED);
-          finishActivity();
+          onCancel(LovMultiSelect.this.getDialog());
+          hideSoftKeyboard(searchView);
+
+          btnBack.getViewTreeObserver()
+              .addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                  if (btnBack.getViewTreeObserver().isAlive()) {
+                    btnBack.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    float value =
+                        ((View) btnBack.getParent()).getRight() - btnBack.getRight() + btnBack
+                            .getWidth();
+                    ObjectAnimator animator = ObjectAnimator
+                        .ofFloat(btnBack, "translationX", value);
+                    animator.setInterpolator(new DecelerateInterpolator(.8F));
+                    animator.setDuration(300);
+                    animator.addListener(new AnimatorListenerAdapter() {
+                      @Override
+                      public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        dismiss();
+                      }
+                    });
+                    animator.start();
+                  }
+                }
+              });
         })
         .build()
         .show(this);
@@ -671,5 +695,15 @@ public class LovMultiSelect extends AppCompatActivity {
         .append("در این صفحه ادامه میدهید؟");
 
     return content.toString();
+  }
+
+  public interface OnResultListener {
+
+    void onResult(List<Item> items);
+  }
+
+  interface FetchDataListener {
+
+    List<Item> fetch();
   }
 }
