@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.btn_call_lov),
             typeface,
             Property.newBuilder()
-                .withButtonOkBackgroundDrawable(R.drawable.btn_ok_bg)
+//                .withButtonOkBackgroundDrawable(R.drawable.btn_ok_bg)
                 .withTagBackgroundColor(R.color.colorPrimary)
                 .withTagBorderColor(R.color.colorAccent)
                 .withBtnOkText("باشه")

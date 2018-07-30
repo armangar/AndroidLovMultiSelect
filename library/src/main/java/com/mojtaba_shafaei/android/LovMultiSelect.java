@@ -644,9 +644,10 @@ public class LovMultiSelect extends AppCompatActivity {
     //dismiss all changes
     BottomDialog.builder()
         .withCancelable(true)
-        .withTitle(R.string.lov_multi_select_cancel_dialog_title)
+        /*.withTitle(R.string.lov_multi_select_cancel_dialog_title)
         .withIcon(ContextCompat
-            .getDrawable(getApplicationContext(), R.drawable.lov_multi_select_ic_warning))
+            .getDrawable(getApplicationContext(), R.drawable.lov_multi_select_ic_warning))*/
+        .withHiddenHeader(true)
         .withContent(getContentString())
         .withPositiveText(R.string.lov_multi_select_yes)
         .withNegativeText(R.string.lov_multi_select_no)

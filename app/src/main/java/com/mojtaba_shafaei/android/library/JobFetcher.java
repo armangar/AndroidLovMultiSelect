@@ -2,12 +2,13 @@ package com.mojtaba_shafaei.android.library;
 
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JobFetcher {
 
   public List<Item> fetch() {
-    List<Item> jobs = new ArrayList<>();
+    List<Item> jobs = new LinkedList<>();
     jobs.add(new Job("1", "یک"));
     jobs.add(new Job("2", "دو"));
     jobs.add(new Job("3", "سه"));
@@ -23,6 +24,7 @@ public class JobFetcher {
     jobs.add(new Job("13", "THIRTEEN"));
     jobs.add(new Job("14", "FOURTEEN"));
     jobs.add(new Job("15", "FIFTEEN"));
+    jobs.add(new Job("16", "شانزدهمین آیتم از لیست که این یک متن ساختگی است برای اینکه متن تست شود"));
 
     return jobs;
   }
