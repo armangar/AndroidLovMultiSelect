@@ -595,6 +595,7 @@ public class LovMultiSelect extends AppCompatDialogFragment {
 
   @Override
   public void onDismiss(DialogInterface dialog) {
+    hideSoftKeyboard(searchView);
     if (mOnDismissListener != null) {
       mOnDismissListener.onDismiss(dialog);
     }
@@ -603,6 +604,7 @@ public class LovMultiSelect extends AppCompatDialogFragment {
 
   @Override
   public void onCancel(DialogInterface dialog) {
+    hideSoftKeyboard(searchView);
     if (mOnCancelListener != null) {
       mOnCancelListener.onCancel(dialog);
     }
@@ -610,6 +612,7 @@ public class LovMultiSelect extends AppCompatDialogFragment {
   }
 
   private void onResult(List<Item> data) {
+    hideSoftKeyboard(searchView);
     if (mOnResultListener != null) {
       mOnResultListener.onResult(data);
     }
