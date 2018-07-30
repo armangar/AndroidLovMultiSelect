@@ -3,9 +3,10 @@ package com.mojtaba_shafaei.android.library;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import com.mojtaba_shafaei.android.LovMultiSelect;
 import com.mojtaba_shafaei.android.LovMultiSelect.Item;
 import com.mojtaba_shafaei.android.Property;
@@ -34,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.btn_call_lov),
             typeface,
             Property.newBuilder()
-//                .withButtonOkBackgroundDrawable(R.drawable.btn_ok_bg)
+                .withButtonOkBackgroundTint(
+                    ContextCompat.getColorStateList(this, R.color.colors_btn))
                 .withTagBackgroundColor(R.color.colorPrimary)
                 .withTagBorderColor(R.color.colorAccent)
                 .withBtnOkText("باشه")

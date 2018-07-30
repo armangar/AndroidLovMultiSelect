@@ -2,6 +2,7 @@ package com.mojtaba_shafaei.android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Typeface;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
@@ -175,9 +176,9 @@ public class LovMultiSelect extends AppCompatActivity {
     }
 
     if (sProperties != null) {
-      if (sProperties.getButtonOkBackgroundDrawable() != null) {
-        btnOk.setBackgroundDrawable(ContextCompat.getDrawable(this,
-            sProperties.getButtonOkBackgroundDrawable()));
+      if (sProperties.getButtonOkBackgroundTint() != null) {
+        btnOk.setBackgroundTintMode(Mode.MULTIPLY);
+        btnOk.setBackgroundTintList(sProperties.getButtonOkBackgroundTint());
       }
 
       if (sProperties.getButtonOkTextColorState() != null) {

@@ -2,9 +2,7 @@ package com.mojtaba_shafaei.android;
 
 import android.content.res.ColorStateList;
 import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.IntRange;
-import org.parceler.Parcel;
 
 /**
  * Created by mojtaba on 3/5/18.
@@ -13,8 +11,7 @@ public final class Property {
 
   private ColorStateList buttonOkTextColorState;
 
-  @DrawableRes
-  private Integer buttonOkBackgroundDrawable = null;
+  private android.content.res.ColorStateList buttonOkBackgroundTint = null;
 
   @ColorRes
   private Integer tagBackgroundColor = null;
@@ -34,7 +31,7 @@ public final class Property {
   }
 
   private Property(Builder builder) {
-    buttonOkBackgroundDrawable = builder.buttonOkBackgroundDrawable;
+    buttonOkBackgroundTint = builder.buttonOkBackgroundDrawable;
     buttonOkTextColorState = builder.buttonOkTextColorState;
     tagBackgroundColor = builder.tagBackgroundColor;
     tagBorderColor = builder.tagBorderColor;
@@ -47,9 +44,8 @@ public final class Property {
     return new Builder();
   }
 
-  @DrawableRes
-  public Integer getButtonOkBackgroundDrawable() {
-    return buttonOkBackgroundDrawable;
+  public ColorStateList getButtonOkBackgroundTint() {
+    return buttonOkBackgroundTint;
   }
 
   public ColorStateList getButtonOkTextColorState() {
@@ -79,7 +75,7 @@ public final class Property {
 
   public static final class Builder {
 
-    private Integer buttonOkBackgroundDrawable;
+    private ColorStateList buttonOkBackgroundDrawable;
     private ColorStateList buttonOkTextColorState;
     private Integer tagBackgroundColor;
     private Integer tagBorderColor;
@@ -90,13 +86,13 @@ public final class Property {
     private Builder() {
     }
 
-    public Builder withButtonOkBackgroundDrawable(@DrawableRes Integer buttonOkBackgroundDrawable) {
-      this.buttonOkBackgroundDrawable = buttonOkBackgroundDrawable;
+    public Builder withButtonOkBackgroundTint(ColorStateList tint) {
+      this.buttonOkBackgroundDrawable = tint;
       return this;
     }
 
-    public Builder withButtonOkTextColor(ColorStateList buttonOkTextColorState) {
-      this.buttonOkTextColorState = buttonOkTextColorState;
+    public Builder withButtonOkTextColor(ColorStateList tint) {
+      this.buttonOkTextColorState = tint;
       return this;
     }
 
@@ -116,8 +112,8 @@ public final class Property {
     }
 
     /**
-     * @param minLimit from -1 to .... <br/>
-     * -1 is default, and wont control minimum of selected items.In other word -1 make LOV Optional.
+     * @param minLimit from -1 to .... <br/> -1 is default, and wont control minimum of selected
+     * items.In other word -1 make LOV Optional.
      * @return {@link Builder} instance
      */
     public Builder withMinLimit(@IntRange(from = -1) int minLimit) {
@@ -126,8 +122,8 @@ public final class Property {
     }
 
     /**
-     * @param maxLimit from -1 to .... <br/>
-     * -1 is default, and wont control <strong>maximum</strong> of selected items.
+     * @param maxLimit from -1 to .... <br/> -1 is default, and wont control
+     * <strong>maximum</strong> of selected items.
      * @return {@link Builder} instance
      */
     public Builder withMaxLimit(@IntRange(from = -1) int maxLimit) {
