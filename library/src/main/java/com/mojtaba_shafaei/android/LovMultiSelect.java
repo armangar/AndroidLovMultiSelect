@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView.OnTagClickListener;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.jakewharton.rxrelay2.PublishRelay;
 import com.mojtaba_shafaei.android.androidBottomDialog.BottomDialog;
 import com.mojtaba_shafaei.android.library.androidLovMultiSelect.R;
@@ -62,7 +62,7 @@ public class LovMultiSelect extends AppCompatDialogFragment {
   private static final String TAG = "LovMultiSelect";
 
   private ContentLoadingProgressBar progressBar;
-  private TextInputEditText searchView;
+  private AppCompatEditText searchView;
   private AppCompatImageButton btnClearSearch;
   private AppCompatImageButton btnBack;
   private MaterialButton btnOk;
@@ -404,7 +404,9 @@ public class LovMultiSelect extends AppCompatDialogFragment {
                   showContentLoading(false);
                   if (lce.getData() != null) {
                     listAdapter.setData(lce.getData().getList());
-                    recyclerView.getLayoutManager().scrollToPosition(0);
+                    if (recyclerView.getLayoutManager() != null) {
+                      recyclerView.getLayoutManager().scrollToPosition(0);
+                    }
                     refreshSelectedCounter();
                   } else {
                     showInternetError();
@@ -444,14 +446,15 @@ public class LovMultiSelect extends AppCompatDialogFragment {
     btnClearSearch.setVisibility(View.GONE);
     ViewCompat.setNestedScrollingEnabled(tagView, false);
 
-    btnClearSearch.setImageDrawable(
-        ContextCompat.getDrawable(getContext(), R.drawable.lov_multi_select_ic_clear_light_theme));
-    btnBack.setImageDrawable(
-        ContextCompat.getDrawable(getContext(), R.drawable.lov_multi_select_ic_back_dark));
-
+    if (getContext() != null) {
+      btnClearSearch.setImageDrawable(
+          ContextCompat
+              .getDrawable(getContext(), R.drawable.lov_multi_select_ic_clear_light_theme));
+      btnBack.setImageDrawable(
+          ContextCompat.getDrawable(getContext(), R.drawable.lov_multi_select_ic_back_dark));
+    }
     ViewCompat.setLayoutDirection(root, ViewCompat.LAYOUT_DIRECTION_RTL);
 
-    progressBar.setVisibility(View.GONE);
     searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
 
     btnBack.getViewTreeObserver()
@@ -468,6 +471,23 @@ public class LovMultiSelect extends AppCompatDialogFragment {
             }
           }
         });
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (getView() != null) {
+      getView().setFocusableInTouchMode(true);
+      getView().requestFocus();
+      getView().setOnKeyListener((v, keyCode, event) -> {
+        if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+          onBackPressed();
+          return true;
+        }
+
+        return false;
+      });
+    }
   }
 
   private void observeAdapter() {
@@ -512,7 +532,11 @@ public class LovMultiSelect extends AppCompatDialogFragment {
   }
 
   private String getQueryText() {
-    return searchView.getText().toString();
+    if (searchView.getText() != null) {
+      return searchView.getText().toString();
+    } else {
+      return "";
+    }
   }
 
   private void addTag(String des) {
@@ -561,9 +585,10 @@ public class LovMultiSelect extends AppCompatDialogFragment {
         tvMessage.setTypeface(sDefaultTypeface);
       }
       tvMessage.setText(e.getMessage());
-      tvMessage
-          .setTextColor(
-              ContextCompat.getColor(getContext(), R.color.lov_multi_select_primaryTextDark));
+      if (getContext() != null) {
+        tvMessage.setTextColor(
+            ContextCompat.getColor(getContext(), R.color.lov_multi_select_primaryTextDark));
+      }
 
     } catch (Exception error) {
       Log.e(TAG, "showErrors: " + error.getMessage(), error);
@@ -636,18 +661,24 @@ public class LovMultiSelect extends AppCompatDialogFragment {
     if (searchView != null) {
       InputMethodManager inputManager = (InputMethodManager)
           searchView.getContext().getSystemService(INPUT_METHOD_SERVICE);
-      inputManager.hideSoftInputFromInputMethod(searchView.getWindowToken(), 0);
-      inputManager.hideSoftInputFromWindow(searchView.getApplicationWindowToken(), 0);
+      if (inputManager != null) {
+        inputManager.hideSoftInputFromInputMethod(searchView.getWindowToken(), 0);
+      }
+      if (inputManager != null) {
+        inputManager.hideSoftInputFromWindow(searchView.getApplicationWindowToken(), 0);
+      }
 
-      getDialog().getWindow().setSoftInputMode(
-          WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+      if (getDialog().getWindow() != null) {
+        getDialog().getWindow().setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+      }
 
       searchView.clearFocus();
       searchView.setSelected(false);
     }
   }
 
-  public void onBackPressed() {
+  private void onBackPressed() {
     //dismiss all changes
     BottomDialog.builder()
         .withCancelable(true)
@@ -656,6 +687,7 @@ public class LovMultiSelect extends AppCompatDialogFragment {
         .withPositiveText(R.string.lov_multi_select_yes)
         .withNegativeText(R.string.lov_multi_select_no)
         .withDirection(BottomDialog.RTL)
+        .withNegativeBackground(R.drawable.bottom_dialog_button_background_transparent)
         .withDefaultTypeface(sDefaultTypeface)
         .withOnNegative(bottomDialog -> {
           onCancel(LovMultiSelect.this.getDialog());
