@@ -658,23 +658,27 @@ public class LovMultiSelect extends AppCompatDialogFragment {
   }
 
   private void hideSoftKeyboard(AppCompatEditText searchView) {
-    if (searchView != null) {
-      InputMethodManager inputManager = (InputMethodManager)
-          searchView.getContext().getSystemService(INPUT_METHOD_SERVICE);
-      if (inputManager != null) {
-        inputManager.hideSoftInputFromInputMethod(searchView.getWindowToken(), 0);
-      }
-      if (inputManager != null) {
-        inputManager.hideSoftInputFromWindow(searchView.getApplicationWindowToken(), 0);
-      }
+    try {
+      if (searchView != null) {
+        InputMethodManager inputManager = (InputMethodManager)
+            searchView.getContext().getSystemService(INPUT_METHOD_SERVICE);
+        if (inputManager != null) {
+          inputManager.hideSoftInputFromInputMethod(searchView.getWindowToken(), 0);
+        }
+        if (inputManager != null) {
+          inputManager.hideSoftInputFromWindow(searchView.getApplicationWindowToken(), 0);
+        }
 
-      if (getDialog().getWindow() != null) {
-        getDialog().getWindow().setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-      }
+        if (getDialog() != null && getDialog().getWindow() != null) {
+          getDialog().getWindow().setSoftInputMode(
+              WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        }
 
-      searchView.clearFocus();
-      searchView.setSelected(false);
+        searchView.clearFocus();
+        searchView.setSelected(false);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 

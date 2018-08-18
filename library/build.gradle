@@ -31,7 +31,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
 
-    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.3.0'
+    implementation 'com.github.Mojtaba-Shafaei:AndroidBottomDialog:1.3.1'
 
     // RxJava's dependency
     //implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
